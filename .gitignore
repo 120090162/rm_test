@@ -34,3 +34,5 @@ application/chassis/matlab_balance/slprj/
 *.scvd
 *.iex
 *.ini
+
+MDK-ARM/.vscode/
