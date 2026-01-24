@@ -125,8 +125,8 @@ int main(void)
 	MX_TIM3_Init();
 	MX_TIM12_Init();
 
-	HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
-	TIM12->CCR2 = 50;
+	// HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
+	// TIM12->CCR2 = 1000;
 
 	MX_UART7_Init();
 	MX_USART1_UART_Init();
@@ -144,7 +144,7 @@ int main(void)
 	/* USER CODE END 2 */
 
 	/* Call init function for freertos objects (in cmsis_os2.c) */
-	MX_FREERTOS_Init();
+	MX_FREERTOS_Init(); // 启用application的任务
 
 	/* Start scheduler */
 	osKernelStart();

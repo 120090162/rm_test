@@ -60,6 +60,8 @@ osStaticThreadDef_t Start_CAN_TaskControlBlock;
 osThreadId Start_Detect_TaskHandle;
 uint32_t Start_Detect_TaskBuffer[ 2048 ];
 osStaticThreadDef_t Start_Detect_TaskControlBlock;
+osThreadId Start_Music_TaskHandle;
+uint32_t Start_Music_TaskBuffer[ 2048 ];
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
