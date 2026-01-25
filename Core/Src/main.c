@@ -69,7 +69,9 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t r = 1;
+uint8_t g = 1;
+uint8_t b = 1;
 /* USER CODE END 0 */
 
 /**
@@ -121,12 +123,10 @@ int main(void)
 	MX_FDCAN2_Init();
 	MX_UART5_Init();
 	MX_SPI2_Init();
+	MX_SPI6_Init();
 
 	MX_TIM3_Init();
 	MX_TIM12_Init();
-
-	// HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
-	// TIM12->CCR2 = 1000;
 
 	MX_UART7_Init();
 	MX_USART1_UART_Init();
@@ -150,6 +150,7 @@ int main(void)
 	osKernelStart();
 
 	/* We should never get here as control is now taken by the scheduler */
+	// main loop does nothing, all the work is done in tasks
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */

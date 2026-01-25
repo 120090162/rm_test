@@ -415,6 +415,11 @@
               <FileType>1</FileType>
               <FilePath>..\Application\Task\Src\Music_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>Led_Flow_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\Led_Flow_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -454,6 +459,11 @@
               <FileName>Bmi088_Reg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Components\Device\Inc\Bmi088_Reg.h</FilePath>
+            </File>
+            <File>
+              <FileName>Ws2812.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Components\Device\Src\Ws2812.c</FilePath>
             </File>
           </Files>
         </Group>
