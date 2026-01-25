@@ -1,8 +1,8 @@
-#ifndef _MUSIC_UNITY_H_
-#define _MUSIC_UNITY_H_
+#ifndef MUSIC_UNITY_H
+#define MUSIC_UNITY_H
 
 #include "music_typedef.h"
 
 extern MusicInfo_s MusicUnityInit(void);
 
-#endif  // _MUSIC_UNITY_H_
+#endif // MUSIC_UNITY_H

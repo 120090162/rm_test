@@ -2,7 +2,7 @@
 
 #include "bsp_buzzer.h"
 #include "music.h"
-#include "stm32f4xx_hal.h"
+#include "stm32h7xx_hal.h"
 
 // clang-format off
 //定义低音  
@@ -48,7 +48,7 @@
 // clang-format on
 
 #define NOTE_NUM 200
-static Note Notes[NOTE_NUM];  // Array of notes
+static Note Notes[NOTE_NUM]; // Array of notes
 static MusicInfo_s MUSIC_INFO;
 
 /*-------------------- User functions --------------------*/
@@ -159,9 +159,9 @@ MusicInfo_s MusicUnityInit(void)
     WRITE_NOTE(C6, OneBeat * 2);
     WRITE_NOTE(D1, OneBeat * 2);
     WRITE_NOTE(D2, OneBeat * 2);
-    WRITE_NOTE(0,OneBeat + 150);
+    WRITE_NOTE(0, OneBeat + 150);
     WRITE_NOTE(C3, OneBeat * 2);
-    WRITE_NOTE(0,OneBeat + 150);
+    WRITE_NOTE(0, OneBeat + 150);
 
     WRITE_NOTE(C6, OneBeat * 2);
     WRITE_NOTE(C6, OneBeat * 2);

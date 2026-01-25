@@ -1,9 +1,8 @@
-
 #include "music_referee.h"
 
 #include "bsp_buzzer.h"
 #include "music.h"
-#include "stm32f4xx_hal.h"
+#include "stm32h7xx_hal.h"
 #include "music_typedef.h"
 
 // clang-format off
@@ -52,12 +51,12 @@
 static Note CONNECT_NOTES[10];
 static Note DISCONNECT_NOTES[10];
 
-static uint32_t last_note_id = 0;        // Index of the last note
-static uint32_t write_id = 1;            // Index of the note to be written
-static uint32_t play_id_connect = 1;     // Index of the note to be played
-static uint32_t play_id_disconnect = 1;  // Index of the note to be played
+static uint32_t last_note_id = 0;       // Index of the last note
+static uint32_t write_id = 1;           // Index of the note to be written
+static uint32_t play_id_connect = 1;    // Index of the note to be played
+static uint32_t play_id_disconnect = 1; // Index of the note to be played
 
-static uint32_t start_time = 0;  // Start time of the music
+static uint32_t start_time = 0; // Start time of the music
 static uint32_t now = 0;
 
 /*-------------------- Private functions --------------------*/
@@ -84,9 +83,11 @@ bool MusicRefereeConncetPlay()
     now = HAL_GetTick();
 
     bool end = false;
-    if (now - start_time >= CONNECT_NOTES[play_id_connect].end) {
+    if (now - start_time >= CONNECT_NOTES[play_id_connect].end)
+    {
         play_id_connect++;
-        if (play_id_connect > last_note_id) {
+        if (play_id_connect > last_note_id)
+        {
             end = true;
             play_id_connect = 1;
             start_time = now;
@@ -102,9 +103,11 @@ bool MusicRefereeDisconnectPlay()
     now = HAL_GetTick();
 
     bool end = false;
-    if (now - start_time >= DISCONNECT_NOTES[play_id_disconnect].end) {
+    if (now - start_time >= DISCONNECT_NOTES[play_id_disconnect].end)
+    {
         play_id_disconnect++;
-        if (play_id_disconnect > last_note_id) {
+        if (play_id_disconnect > last_note_id)
+        {
             end = true;
             play_id_disconnect = 1;
             start_time = now;

@@ -2,7 +2,7 @@
 
 #include "bsp_buzzer.h"
 #include "music.h"
-#include "stm32f4xx_hal.h"
+#include "stm32h7xx_hal.h"
 
 // clang-format off
 #define dolll   66
@@ -98,7 +98,7 @@
 // clang-format on
 
 #define NOTE_NUM 240
-static Note Notes[NOTE_NUM];  // Array of notes
+static Note Notes[NOTE_NUM]; // Array of notes
 static MusicInfo_s MUSIC_INFO;
 
 /*-------------------- User functions --------------------*/
@@ -106,14 +106,14 @@ static MusicInfo_s MUSIC_INFO;
 MusicInfo_s MusicCanonInit(void)
 {
     MUSIC_INFO.notes = Notes;
-    
+
     // SleepNote(800);
 
-    //第一行
-    // WRITE_NOTE(min*1.1225,800);
-    // SleepNote(800);
-    // WRITE_NOTE(ren*1.1225,800);
-    // SleepNote(800);
+    // 第一行
+    //  WRITE_NOTE(min*1.1225,800);
+    //  SleepNote(800);
+    //  WRITE_NOTE(ren*1.1225,800);
+    //  SleepNote(800);
 
     // WRITE_NOTE(don*1.1225,800);
     // SleepNote(800);
@@ -130,11 +130,11 @@ MusicInfo_s MusicCanonInit(void)
     // WRITE_NOTE(sil*1.1225,800);
     // SleepNote(800);
 
-    //第二行
-    // WRITE_NOTE(mih*1.1225,800);
-    // SleepNote(800);
-    // WRITE_NOTE(reh*1.1225,800);
-    // WRITE_NOTE(fan*1.1225,800);
+    // 第二行
+    //  WRITE_NOTE(mih*1.1225,800);
+    //  SleepNote(800);
+    //  WRITE_NOTE(reh*1.1225,800);
+    //  WRITE_NOTE(fan*1.1225,800);
 
     // WRITE_NOTE(doh*1.1225,800);
     // SleepNote(800);
@@ -151,13 +151,13 @@ MusicInfo_s MusicCanonInit(void)
     // WRITE_NOTE(son*1.1225,800);
     // WRITE_NOTE(sin*1.1225,800);
 
-    //第三行
-    // WRITE_NOTE(doh*1.1225,400);
-    // WRITE_NOTE(sin*1.1225,400);
-    // WRITE_NOTE(doh*1.1225,400);
-    // WRITE_NOTE(min*1.1225,400);
-    // WRITE_NOTE(son*1.1225,800);
-    // WRITE_NOTE(sin*1.1225,800);
+    // 第三行
+    //  WRITE_NOTE(doh*1.1225,400);
+    //  WRITE_NOTE(sin*1.1225,400);
+    //  WRITE_NOTE(doh*1.1225,400);
+    //  WRITE_NOTE(min*1.1225,400);
+    //  WRITE_NOTE(son*1.1225,800);
+    //  WRITE_NOTE(sin*1.1225,800);
 
     // WRITE_NOTE(doh*1.1225,800);
     // WRITE_NOTE(mih*1.1225,800);
@@ -183,15 +183,15 @@ MusicInfo_s MusicCanonInit(void)
     // WRITE_NOTE(doh*1.1225,400);
     // WRITE_NOTE(sin*1.1225,400);
 
-    //第四行
-    // WRITE_NOTE(doh*1.1225,400);
-    // WRITE_NOTE(sin*1.1225,400);
-    // WRITE_NOTE(doh*1.1225,400);
-    // WRITE_NOTE(fan*1.1225,400);
-    // WRITE_NOTE(son*1.1225,400);
-    // WRITE_NOTE(sil*1.1225,400);
-    // WRITE_NOTE(sin*1.1225,400);
-    // WRITE_NOTE(fan*1.1225,400);
+    // 第四行
+    //  WRITE_NOTE(doh*1.1225,400);
+    //  WRITE_NOTE(sin*1.1225,400);
+    //  WRITE_NOTE(doh*1.1225,400);
+    //  WRITE_NOTE(fan*1.1225,400);
+    //  WRITE_NOTE(son*1.1225,400);
+    //  WRITE_NOTE(sil*1.1225,400);
+    //  WRITE_NOTE(sin*1.1225,400);
+    //  WRITE_NOTE(fan*1.1225,400);
 
     // WRITE_NOTE(doh*1.1225,800);
     // WRITE_NOTE(mih*1.1225,400);
@@ -220,17 +220,17 @@ MusicInfo_s MusicCanonInit(void)
     // WRITE_NOTE(reh*1.1225,200);
     // WRITE_NOTE(son*1.1225,200);
 
-    //第五行
-    // WRITE_NOTE(mih*1.1225,600);
-    // WRITE_NOTE(son*1.1225,200);
-    // WRITE_NOTE(mih*1.1225,400);
-    // WRITE_NOTE(doh*1.1225,200);
-    // WRITE_NOTE(reh*1.1225,800);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(fah*1.1225,200);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(reh*1.1225,200);
-    // WRITE_NOTE(min*1.1225,200);
+    // 第五行
+    //  WRITE_NOTE(mih*1.1225,600);
+    //  WRITE_NOTE(son*1.1225,200);
+    //  WRITE_NOTE(mih*1.1225,400);
+    //  WRITE_NOTE(doh*1.1225,200);
+    //  WRITE_NOTE(reh*1.1225,800);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(fah*1.1225,200);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(reh*1.1225,200);
+    //  WRITE_NOTE(min*1.1225,200);
 
     // WRITE_NOTE(doh*1.1225,600);
     // WRITE_NOTE(doh*1.1225,400);
@@ -269,18 +269,18 @@ MusicInfo_s MusicCanonInit(void)
     // WRITE_NOTE(reh*1.1225,200);
     // WRITE_NOTE(son*1.1225,200);
 
-    //第六行
-    // WRITE_NOTE(mih*1.1225,800);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(reh*1.1225,200);
-    // WRITE_NOTE(doh*1.1225,200);
-    // WRITE_NOTE(reh*1.1225,400);
-    // WRITE_NOTE(son*1.1225,400);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(fah*1.1225,200);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(reh*1.1225,200);
-    // WRITE_NOTE(min*1.1225,200);
+    // 第六行
+    //  WRITE_NOTE(mih*1.1225,800);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(reh*1.1225,200);
+    //  WRITE_NOTE(doh*1.1225,200);
+    //  WRITE_NOTE(reh*1.1225,400);
+    //  WRITE_NOTE(son*1.1225,400);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(fah*1.1225,200);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(reh*1.1225,200);
+    //  WRITE_NOTE(min*1.1225,200);
 
     // WRITE_NOTE(reh*1.1225,600);
     // WRITE_NOTE(doh*1.1225,400);
@@ -317,7 +317,7 @@ MusicInfo_s MusicCanonInit(void)
     WRITE_NOTE(reh * 1.1225, 200);
     WRITE_NOTE(doh * 1.1225, 200);
 
-    //第七行
+    // 第七行
     WRITE_NOTE(soh * 1.1225, 400);
     WRITE_NOTE(mih * 1.1225, 200);
     WRITE_NOTE(fah * 1.1225, 200);
@@ -377,7 +377,7 @@ MusicInfo_s MusicCanonInit(void)
     WRITE_NOTE(mih * 1.1225, 200);
     WRITE_NOTE(fah * 1.1225, 200);
     WRITE_NOTE(soh * 1.1225, 200);
-    //第八行
+    // 第八行
     WRITE_NOTE(soh * 1.1225, 400);
     WRITE_NOTE(mih * 1.1225, 200);
     WRITE_NOTE(fah * 1.1225, 200);
@@ -437,7 +437,7 @@ MusicInfo_s MusicCanonInit(void)
     WRITE_NOTE(mih * 1.1225, 200);
     WRITE_NOTE(fah * 1.1225, 200);
     WRITE_NOTE(soh * 1.1225, 200);
-    //第九行
+    // 第九行
     WRITE_NOTE(soh * 1.1225, 400);
     WRITE_NOTE(doh * 1.1225, 200);
     WRITE_NOTE(reh * 1.1225, 200);
@@ -497,7 +497,7 @@ MusicInfo_s MusicCanonInit(void)
     WRITE_NOTE(doh * 1.1225, 200);
     WRITE_NOTE(lan * 1.1225, 200);
     WRITE_NOTE(sin * 1.1225, 200);
-    //第十行
+    // 第十行
     WRITE_NOTE(doh * 1.1225, 200);
     WRITE_NOTE(dol * 1.1225, 200);
     WRITE_NOTE(sol * 1.1225, 400);
@@ -535,17 +535,17 @@ MusicInfo_s MusicCanonInit(void)
     WRITE_NOTE(son * 1.1225, 400);
     WRITE_NOTE(sin * 1.1225, 400);
 
-    //第十一行
-    // 	WRITE_NOTE(don*1.1225,400);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(fah*1.1225,200);
-    // WRITE_NOTE(soh*1.1225,400);
-    // WRITE_NOTE(mih*1.1225,400);
-    // 	WRITE_NOTE(sol*1.1225,400);
-    // WRITE_NOTE(reh*1.1225,200);
-    // WRITE_NOTE(mih*1.1225,200);
-    // WRITE_NOTE(fah*1.1225,400);
-    // WRITE_NOTE(reh*1.1225,400);
+    // 第十一行
+    //  	WRITE_NOTE(don*1.1225,400);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(fah*1.1225,200);
+    //  WRITE_NOTE(soh*1.1225,400);
+    //  WRITE_NOTE(mih*1.1225,400);
+    //  	WRITE_NOTE(sol*1.1225,400);
+    //  WRITE_NOTE(reh*1.1225,200);
+    //  WRITE_NOTE(mih*1.1225,200);
+    //  WRITE_NOTE(fah*1.1225,400);
+    //  WRITE_NOTE(reh*1.1225,400);
 
     // 	WRITE_NOTE(lal*1.1225,200);
     // WRITE_NOTE(lan*1.1225,200);

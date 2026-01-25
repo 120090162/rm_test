@@ -1,9 +1,9 @@
-#ifndef __MUSIC_HAO_YUN_LAI_H_
-#define __MUSIC_HAO_YUN_LAI_H_
+#ifndef MUSIC_HAO_YUN_LAI_H
+#define MUSIC_HAO_YUN_LAI_H
 
 #include "music_typedef.h"
 
 extern MusicInfo_s MusicHaoYunLaiInit(void);
 
-#endif  // __MUSIC_CANON_H_
+#endif // MUSIC_HAO_YUN_LAI_H
 /*------------------------------ End of File ------------------------------*/

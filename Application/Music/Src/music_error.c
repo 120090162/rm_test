@@ -3,7 +3,7 @@
 
 #include "bsp_buzzer.h"
 #include "music.h"
-#include "stm32f4xx_hal.h"
+#include "stm32h7xx_hal.h"
 #include "music_typedef.h"
 
 // clang-format off
@@ -50,13 +50,13 @@
 // clang-format on
 
 #define NOTE_NUM 10
-static Note Notes[NOTE_NUM];  // Array of notes
+static Note Notes[NOTE_NUM]; // Array of notes
 
-static uint32_t last_note_id = 0;  // Index of the last note
-static uint32_t write_id = 1;      // Index of the note to be written
-static uint32_t play_id = 1;       // Index of the note to be played
+static uint32_t last_note_id = 0; // Index of the last note
+static uint32_t write_id = 1;     // Index of the note to be written
+static uint32_t play_id = 1;      // Index of the note to be played
 
-static uint32_t start_time = 0;  // Start time of the music
+static uint32_t start_time = 0; // Start time of the music
 static uint32_t now = 0;
 
 /*-------------------- Private functions --------------------*/
@@ -79,9 +79,11 @@ bool MusicErrorPlay(void)
 {
     now = HAL_GetTick();
     bool end = false;
-    if (now - start_time >= Notes[play_id].end) {
+    if (now - start_time >= Notes[play_id].end)
+    {
         play_id++;
-        if (play_id > last_note_id) {
+        if (play_id > last_note_id)
+        {
             end = true;
             play_id = 1;
             start_time = now;

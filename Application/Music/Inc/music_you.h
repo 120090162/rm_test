@@ -1,7 +1,7 @@
-#ifndef _MUSIC_YOU_H_
-#define _MUSIC_YOU_H_
+#ifndef MUSIC_YOU_H
+#define MUSIC_YOU_H
 #include "music_typedef.h"
 
 extern MusicInfo_s MusicYouInit(void);
 
-#endif  // _MUSIC_YOU_H_
+#endif // MUSIC_YOU_H

@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H723xx,ARM_MATH_CM7,__FPU_PRESENT=1U,ARM_MATH_CHECK</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Application/Task/Inc;../Components/Device/Inc;../Components/Controller/Inc;../Components/Algorithm/Inc;../BSP/Inc;../SystemView/SEGGER/Syscalls;../SystemView/Sample/FreeRTOSV10;../SystemView/Sample/FreeRTOSV10/Patch;../SystemView/Config;../SystemView/SEGGER;../Middlewares/ST/ARM/DSP/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;..\Application\TypeDef\Inc</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Application/Task/Inc;../Components/Device/Inc;../Components/Controller/Inc;../Components/Algorithm/Inc;../BSP/Inc;../SystemView/SEGGER/Syscalls;../SystemView/Sample/FreeRTOSV10;../SystemView/Sample/FreeRTOSV10/Patch;../SystemView/Config;../SystemView/SEGGER;../Middlewares/ST/ARM/DSP/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;..\Application\TypeDef\Inc;..\Application\Music\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,6 +409,11 @@
               <FileName>Config.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Application\Task\Inc\Config.h</FilePath>
+            </File>
+            <File>
+              <FileName>Music_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\Music_Task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -549,6 +554,11 @@
               <FileName>CRC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Components\Algorithm\Src\CRC.c</FilePath>
+            </File>
+            <File>
+              <FileName>KFIFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Components\Algorithm\Src\KFIFO.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2893,6 +2903,81 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/Music</GroupName>
+          <Files>
+            <File>
+              <FileName>music_canon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_canon.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_castle_in_the_sky.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_castle_in_the_sky.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_deja_vu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_deja_vu.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_error.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_gong_xi_fa_cai.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_gong_xi_fa_cai.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_hao_yun_lai.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_hao_yun_lai.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_meow.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_meow.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_motor_offline.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_motor_offline.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_rc_offline.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_rc_offline.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_referee.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_referee.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_see_you_again.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_see_you_again.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_start.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_start.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_unity.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_unity.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_you.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_you.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,9 +1,9 @@
-#ifndef __MUSIC_MEOW_H_
-#define __MUSIC_MEOW_H_
+#ifndef MUSIC_MEOW_H
+#define MUSIC_MEOW_H
 
 extern void MusicMeowInit(void);
 
 extern void MusicMeowPlay(void);
 
-#endif  // __MUSIC_MEOW_H_
+#endif // MUSIC_MEOW_H
 /*------------------------------ End of File ------------------------------*/

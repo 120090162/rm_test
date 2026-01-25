@@ -19,12 +19,13 @@ void buzzer_off(void)
  * @param note note
  * @param volume 音量，范围[0.0\\~1.0],用百分比表示
  */
-void buzzer_note(uint16_t note,float volume)
+void buzzer_note(uint16_t note, float volume)
 {
-    if(volume > 1.0f)
+    if (volume > 1.0f)
     {
         volume = 1.0f;
-    }else if(volume < 0.0f)
+    }
+    else if (volume < 0.0f)
     {
         volume = 0.0f;
     }
@@ -33,16 +34,16 @@ void buzzer_note(uint16_t note,float volume)
 
     // 重置定时器计数器
     htim12.Instance->CNT = 0;
-    
+
     // 设置自动重装载寄存器（ARR），以控制PWM信号的频率
     htim12.Instance->ARR = (TIM12_CLOCK_FREQ / note - 1) * 1u;
-    
+
     // 设置比较寄存器（CCR2），以控制PWM信号的占空比
     htim12.Instance->CCR2 = (TIM12_CLOCK_FREQ / 2 / note - 1) * volume * 1u;
-    
+
     // 重新启用定时器
     __HAL_TIM_ENABLE(&htim12);
-    
+
     // 启动PWM信号
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
 }
