@@ -17,7 +17,6 @@
 
 #define GRAVITY 9.8f
 
-
 typedef signed char int8_t;
 typedef signed short int int16_t;
 typedef signed int int32_t;

@@ -22,3 +22,8 @@
 [rm论坛辽科开源](https://bbs.robomaster.com/article/434199)
 
 [SystemView工具使用](https://zhuanlan.zhihu.com/p/540619363)
+
+## 平衡步兵开发
+[达妙开源](https://gl1po2nscb.feishu.cn/drive/folder/RJL7fFT4ll9PDSdvM6Pc5vntnPw)
+
+[arm5到arm6迁移问题](https://blog.csdn.net/pingis58/article/details/128340069)
