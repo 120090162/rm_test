@@ -27,3 +27,10 @@
 [达妙开源](https://gl1po2nscb.feishu.cn/drive/folder/RJL7fFT4ll9PDSdvM6Pc5vntnPw)
 
 [arm5到arm6迁移问题](https://blog.csdn.net/pingis58/article/details/128340069)
+
+## 五连杆算法流程
+[哈工大开源](https://zhuanlan.zhihu.com/p/563048952)
+
+[matlab仿真](https://www.bilibili.com/video/BV1AS42197jb/)
+
+[mujoco仿真](https://www.bilibili.com/video/BV17GFCzPEk2/)
