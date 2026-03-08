@@ -15,10 +15,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "cmsis_os.h"
 #include "INS_Task.h"
-#include "BMI088driver.h"
-#include "lpf.h"
+#include "Bmi088.h"
+#include "LPF.h"
 #include "pid.h"
-#include "config.h"
+#include "Config.h"
 #include "tim.h"
 #include "Quaternion.h"
 #include "bsp_pwm.h"
@@ -99,17 +99,17 @@ void INS_Task(void const *argument)
 		INS_Task_SysTick = osKernelSysTick();
 
 		/* Update the BMI088 measurement */
-		BMI088_Read(&BMI088);
+		BMI088_Info_Update(&BMI088_Info);
 
 		/* Accel measurement LPF2p */
-		INS_Info.Accel[0] = LowPassFilter2p_Update(&INS_AccelPF2p[0], BMI088.Accel[0]);
-		INS_Info.Accel[1] = LowPassFilter2p_Update(&INS_AccelPF2p[1], BMI088.Accel[1]);
-		INS_Info.Accel[2] = LowPassFilter2p_Update(&INS_AccelPF2p[2], BMI088.Accel[2]);
+		INS_Info.Accel[0] = LowPassFilter2p_Update(&INS_AccelPF2p[0], BMI088_Info.Accel[0]);
+		INS_Info.Accel[1] = LowPassFilter2p_Update(&INS_AccelPF2p[1], BMI088_Info.Accel[1]);
+		INS_Info.Accel[2] = LowPassFilter2p_Update(&INS_AccelPF2p[2], BMI088_Info.Accel[2]);
 
 		/* Update the INS gyro in radians */
-		INS_Info.Gyro[0] = BMI088.Gyro[0];
-		INS_Info.Gyro[1] = BMI088.Gyro[1];
-		INS_Info.Gyro[2] = BMI088.Gyro[2];
+		INS_Info.Gyro[0] = BMI088_Info.Gyro[0];
+		INS_Info.Gyro[1] = BMI088_Info.Gyro[1];
+		INS_Info.Gyro[2] = BMI088_Info.Gyro[2];
 
 		/* Update the QuaternionEKF */
 		QuaternionEKF_Update(&Quaternion_Info, INS_Info.Gyro, INS_Info.Accel, 0.001f);
@@ -141,7 +141,7 @@ void INS_Task(void const *argument)
 
 		if (INS_Task_SysTick % 5 == 0)
 		{
-			BMI088_Temp_Control(BMI088.Temperature);
+			BMI088_Temp_Control(BMI088_Info.Temperature);
 		}
 
 		osDelayUntil(&INS_Task_SysTick, 1);

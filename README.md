@@ -28,9 +28,21 @@
 
 [arm5到arm6迁移问题](https://blog.csdn.net/pingis58/article/details/128340069)
 
+[东莞理工开源报告](https://bbs.robomaster.com/article/728195?source=8)
+
 ## 五连杆算法流程
 [哈工大开源](https://zhuanlan.zhihu.com/p/563048952)
 
 [matlab仿真](https://www.bilibili.com/video/BV1AS42197jb/)
 
 [mujoco仿真](https://www.bilibili.com/video/BV17GFCzPEk2/)
+
+[上交开源解读](https://www.bilibili.com/video/BV1cw4m1i7fj?spm_id_from=333.788.videopod.sections&vd_source=a61233bf2bcd88af9cb7538da95fa883)
+
+[五连杆运动学解算与VMC](https://zhuanlan.zhihu.com/p/613007726)
+
+[轮腿倒立摆机器人运动速度估计](https://zhuanlan.zhihu.com/p/689921165)
+
+[LQR推导](https://blog.csdn.net/weixin_51772802/article/details/128767706)
+
+[整体工程性思考](https://www.robook.org/blog/dkgzzj)

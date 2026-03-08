@@ -19,10 +19,8 @@
 #include "bsp_pwm.h"
 #include "bsp_uart.h"
 #include "bsp_adc.h"
-#include "BMI088driver.h"
+#include "Bmi088.h"
 #include "usb_device.h"
-
-#include "spi.h"
 
 /**
  * @brief Initializes the MCU.
@@ -37,10 +35,6 @@ void MCU_Init(void)
 	BSP_ADC_Init();
 	MX_USB_DEVICE_Init();
 	/* ----------------------- Device Init ----------------------- */
-	/* BMI088初始化 */
-	while (BMI088_init(&hspi2, 0) != BMI088_NO_ERROR)
-	{
-		;
-	}
+	BMI088_Init();
 }
 //------------------------------------------------------------------------------

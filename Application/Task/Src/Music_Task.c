@@ -22,8 +22,9 @@
 #include "music_typedef.h"
 #include "music_unity.h"
 #include "music_you.h"
+#include "music_crychic.h"
 // #include "referee.h"
-// #include "remote_control.h"
+#include "Remote_Control.h"
 #include "stm32h7xx_hal.h"
 
 #if INCLUDE_uxTaskGetStackHighWaterMark
@@ -33,11 +34,11 @@ uint32_t music_high_water;
 #define ABNORMAL_WARNING_INTERVAL 5000 // ms
 
 // 启用遥控器离线报警
-#define ENABLE_ALARM_RC_OFFLINE false
+#define ENABLE_ALARM_RC_OFFLINE true
 // 启用电机离线报警
-#define ENABLE_ALARM_MOTOR_OFFLINE true
+#define ENABLE_ALARM_MOTOR_OFFLINE false
 // 启用裁判系统离线检测
-#define ENABLE_CHECK_REFEREE_OFFLINE true
+#define ENABLE_CHECK_REFEREE_OFFLINE false
 
 #define STEP_INIT 1
 #define STEP_NORMAL 2
@@ -67,6 +68,7 @@ typedef enum
     CALI_CHASSIS,
     PLAY_MOTOR_OFFLINE,
     PLAY_RC_OFFLINE,
+    REFEREE_OFFLINE,
 } Playing_e;
 
 typedef enum
@@ -85,6 +87,7 @@ typedef enum
     see_you_again,
     unity,
     you,
+    crychic,
 } MusicIndex_e;
 
 // Variable Declarations
@@ -182,6 +185,7 @@ static void MusicInit(void)
     // MUSICS[see_you_again]     = MusicSeeYouAgainInit();
     MUSICS[hao_yun_lai]       = MusicHaoYunLaiInit();
     MUSICS[gong_xi_fa_cai]    = MusicGongXiFaCaiInit();
+    MUSICS[crychic]           = MusicCrychicInit();
     // MUSICS[deja_vu]           = MusicDejaVuInit();
     // clang-format on
 }
@@ -202,13 +206,18 @@ static void MusicPlay(void)
         {
             last_abnormal_warning_time = HAL_GetTick();
 
-            // if (ENABLE_ALARM_RC_OFFLINE && GetRcOffline())
-            // { // 检测遥控器是否离线
-            //     __kfifo_put(play_list_fifo, (unsigned char *)&PLAY_RC_OFFLINE, sizeof(PLAY_RC_OFFLINE));
-            // }
+            if (ENABLE_ALARM_RC_OFFLINE && GetRcOffline())
+            { // 检测遥控器是否离线
+                is_play = PLAY_RC_OFFLINE;
+                __kfifo_put(play_list_fifo, (unsigned char *)&is_play, sizeof(is_play));
+            }
             // if (ENABLE_ALARM_MOTOR_OFFLINE && ScanOfflineMotor())
             // { // 检测是否存在离线电机
             //     __kfifo_put(play_list_fifo, (unsigned char *)&PLAY_MOTOR_OFFLINE, sizeof(PLAY_MOTOR_OFFLINE));
+            // }
+            // if (ENABLE_CHECK_REFEREE_OFFLINE && GetRefereeOffline())
+            // { // 检测裁判系统是否离线
+            //     __kfifo_put(&play_list_fifo, (unsigned char *)&REFEREE_OFFLINE, sizeof(REFEREE_OFFLINE));
             // }
         }
 
@@ -243,16 +252,15 @@ static void MusicPlay(void)
         }
         break;
 
+        case REFEREE_OFFLINE:
+        {
+            if (PlayMusic(&MUSICS[error], 0.5f))
+                is_play = PLAY_NONE;
+        }
+        break;
+
         default:
         {
-            // if ((!ENABLE_CHECK_REFEREE_OFFLINE) || (!GetRefereeOffline()))
-            // {
-            //     PlayMusic(&MUSICS[hao_yun_lai], 0.1f);
-            // }
-            // else
-            // {
-            //     buzzer_off();
-            // }
             buzzer_off();
         }
         break;

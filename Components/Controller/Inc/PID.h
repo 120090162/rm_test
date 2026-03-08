@@ -1,15 +1,15 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : pid.c
-  * @brief          : pid functions 
-  * @author         : Yan Yuanbin
-  * @date           : 2023/04/27
-  * @version        : v1.0
-  ******************************************************************************
-  * @attention      : To be perfected
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : pid.c
+ * @brief          : pid functions
+ * @author         : Yan Yuanbin
+ * @date           : 2023/04/27
+ * @version        : v1.0
+ ******************************************************************************
+ * @attention      : To be perfected
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -17,7 +17,7 @@
 #define CONTROLLER_PID_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "config.h"
+#include "Config.h"
 #include "lpf.h"
 /* Exported defines -----------------------------------------------------------*/
 /**
@@ -27,16 +27,24 @@
  * @param max: the maximum value of the specified variable
  * @retval none
  */
-#define VAL_LIMIT(x,min,max)  do{ \
-                                    if ((x) > (max)) {(x) = (max);} \
-                                    else if ((x) < (min)) {(x) = (min);} \
-                                }while(0U)
+// #define VAL_LIMIT(x, min, max) \
+// 	do                         \
+// 	{                          \
+// 		if ((x) > (max))       \
+// 		{                      \
+// 			(x) = (max);       \
+// 		}                      \
+// 		else if ((x) < (min))  \
+// 		{                      \
+// 			(x) = (min);       \
+// 		}                      \
+// 	} while (0U)
 
 /**
  * @brief macro definition of the number of pid parameters
-*/
-#ifndef PID_PARAMETER_NUM 
-#define PID_PARAMETER_NUM 7							
+ */
+#ifndef PID_PARAMETER_NUM
+#define PID_PARAMETER_NUM 7
 #endif
 
 /* Exported types ------------------------------------------------------------*/
@@ -45,97 +53,93 @@
  */
 typedef enum
 {
-    PID_ERROR_NONE = 0x00U,        /*!< No error */
-    PID_FAILED_INIT = 0x01U,        /*!< Initialization failed */
-		PID_CALC_NANINF = 0x02U,      /*!< Not-a-number (NaN) or infinity is generated */
-    PID_Status_NUM,
-}PID_Status_e;
+	PID_ERROR_NONE = 0x00U,	 /*!< No error */
+	PID_FAILED_INIT = 0x01U, /*!< Initialization failed */
+	PID_CALC_NANINF = 0x02U, /*!< Not-a-number (NaN) or infinity is generated */
+	PID_Status_NUM,
+} PID_Status_e;
 
 /**
  * @brief typedef enum that contains the type for the pid controller.
  */
 typedef enum
 {
-		PID_Type_None = 0x00U,         /*!< No Type */
-		PID_POSITION = 0x01U,          /*!< position pid */
-		PID_VELOCITY = 0x02U,          /*!< velocity pid */
-    PID_TYPE_NUM,
-}PID_Type_e;
+	PID_Type_None = 0x00U, /*!< No Type */
+	PID_POSITION = 0x01U,  /*!< position pid */
+	PID_VELOCITY = 0x02U,  /*!< velocity pid */
+	PID_TYPE_NUM,
+} PID_Type_e;
 
 /**
  * @brief typedef structure that contains the information for the pid Error handler.
  */
 typedef struct
 {
-    uint16_t ErrorCount;    /*!< Error status judgment count */
-    PID_Status_e Status;    /*!< Error Status */
-}PID_ErrorHandler_Typedef;
+	uint16_t ErrorCount; /*!< Error status judgment count */
+	PID_Status_e Status; /*!< Error Status */
+} PID_ErrorHandler_Typedef;
 
 /**
  * @brief typedef structure that contains the parameters for the pid controller.
  */
 typedef struct
 {
-    float KP;             //±ÈÀýÏµÊý
-    float KI;             //»ý·ÖÏµÊý
-    float KD;             //Î¢·ÖÏµÊý
-    float Alpha;           //Î¢·ÖÒ»½×ÂË²¨Æ÷ÏµÊý
-		float Deadband;       //ËÀÇø µ±Îó²î¾ø¶ÔÖµÐ¡ÓÚËÀÇø PIDÍ£Ö¹¼ÆËã¡£
-    float LimitIntegral;  //»ý·ÖÏÞ·ù
-    float LimitOutput;    //×ÜÊä³öÏÞ·ù
-}PID_Parameter_Typedef;
+	float KP;			 // ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
+	float KI;			 // ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
+	float KD;			 // Î¢ï¿½ï¿½Ïµï¿½ï¿½
+	float Alpha;		 // Î¢ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½Ïµï¿½ï¿½
+	float Deadband;		 // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÐ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ PIDÍ£Ö¹ï¿½ï¿½ï¿½ã¡£
+	float LimitIntegral; // ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
+	float LimitOutput;	 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
+} PID_Parameter_Typedef;
 
 /**
  * @brief typedef structure that contains the information for the pid controller.
  */
 typedef struct _PID_TypeDef
 {
-		PID_Type_e Type;    //PIDÀàÐÍ Î»ÖÃÊ½orÔöÁ¿Ê½ Í¨³£Ê¹ÓÃÎ»ÖÃÊ½
-	
-		float Target;       //Ä¿±êÖµ
-		float Measure;      //Êµ¼ÊÖµ
-	
-    float Err[3];       //Îó²î Ä¿±êÖµ-ÆÚÍûÖµ = Îó²î µ±Ç°ÒÔ¼°¹ýÈ¥Á½´ÎµÄÎó²î 
-		float Integral;     //Îó²î»ý·ÖÖµ Îó²îÀÛ¼Ó
-    float Pout;         // KP * Îó²îÖµ ±ÈÀýÊä³ö
-    float Iout;         // KI * Îó²î»ý·Ö »ý·ÖÊä³ö
-    float Dout;         // KD * Îó²îÎ¢·Ö£¨²î·Ö£©Î¢·ÖÊä³ö
-    float Output;       //×ÜÊä³ö Pout + Iout + Dout = Output
-	
-	  LowPassFilter1p_Info_TypeDef Dout_LPF; //Î¢·ÖÊä³öµÄÒ»½×ÂË²¨Æ÷
-	
-	
-		PID_Parameter_Typedef Param;            //PID²ÎÊý½á¹¹Ìå
-    PID_ErrorHandler_Typedef ERRORHandler;  //PID´íÎó´¦Àí½á¹¹Ìå
+	PID_Type_e Type; // PIDï¿½ï¿½ï¿½ï¿½ Î»ï¿½ï¿½Ê½orï¿½ï¿½ï¿½ï¿½Ê½ Í¨ï¿½ï¿½Ê¹ï¿½ï¿½Î»ï¿½ï¿½Ê½
 
-    /**
-     * @brief ³õÊ¼»¯PID²ÎÊýµÄº¯ÊýÖ¸Õë£¬½«PID²ÎÊý×°ÔØÖÁPID²ÎÊý½á¹¹ÌåÖÐ¡£
-     * @param PID: Ö¸Ïò_pid_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄÐÅÏ¢¡£
-     * @param Param: Ö¸ÏòPID²ÎÊýµÄ¸¡µãÐÍÖ¸Õë£¬°üº¬PID²ÎÊý¡£
-     * @retval PID´íÎó×´Ì¬ ·µ»ØPIDÊÇ·ñ³õÊ¼»¯³É¹¦¡£
-     */
-    PID_Status_e (*PID_Param_Init)(struct _PID_TypeDef *PID,float *Param);
+	float Target;  // Ä¿ï¿½ï¿½Öµ
+	float Measure; // Êµï¿½ï¿½Öµ
 
-    /**
-     * @brief Çå³ýpid¼ÆËãº¯ÊýµÄ¼ò¶ÌÖ¸Õë¡£
-     * @param PID:Ö¸Ïò_pid_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄÐÅÏ¢¡£
-     * @retval ÎÞ.
-     */
-		void (*PID_Calc_Clear)(struct _PID_TypeDef *PID);
-				
-}PID_Info_TypeDef;
+	float Err[3];	// ï¿½ï¿½ï¿½ Ä¿ï¿½ï¿½Öµ-ï¿½ï¿½ï¿½ï¿½Öµ = ï¿½ï¿½ï¿½ ï¿½ï¿½Ç°ï¿½Ô¼ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½ï¿½
+	float Integral; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ ï¿½ï¿½ï¿½ï¿½Û¼ï¿½
+	float Pout;		// KP * ï¿½ï¿½ï¿½Öµ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	float Iout;		// KI * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	float Dout;		// KD * ï¿½ï¿½ï¿½Î¢ï¿½Ö£ï¿½ï¿½ï¿½Ö£ï¿½Î¢ï¿½ï¿½ï¿½ï¿½ï¿½
+	float Output;	// ï¿½ï¿½ï¿½ï¿½ï¿½ Pout + Iout + Dout = Output
 
+	LowPassFilter1p_Info_TypeDef Dout_LPF; // Î¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½
+
+	PID_Parameter_Typedef Param;		   // PIDï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½
+	PID_ErrorHandler_Typedef ERRORHandler; // PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½
+
+	/**
+	 * @brief ï¿½ï¿½Ê¼ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½Ö¸ï¿½ë£¬ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½Ð¡ï¿½
+	 * @param PID: Ö¸ï¿½ï¿½_pid_TypeDefï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½
+	 * @param Param: Ö¸ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @retval PIDï¿½ï¿½ï¿½ï¿½×´Ì¬ ï¿½ï¿½ï¿½ï¿½PIDï¿½Ç·ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½
+	 */
+	PID_Status_e (*PID_Param_Init)(struct _PID_TypeDef *PID, float *Param);
+
+	/**
+	 * @brief ï¿½ï¿½ï¿½pidï¿½ï¿½ï¿½ãº¯ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ö¸ï¿½ë¡£
+	 * @param PID:Ö¸ï¿½ï¿½_pid_TypeDefï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½
+	 * @retval ï¿½ï¿½.
+	 */
+	void (*PID_Calc_Clear)(struct _PID_TypeDef *PID);
+
+} PID_Info_TypeDef;
 
 /* Exported functions prototypes ---------------------------------------------*/
 /**
  * @brief Initializes the PID Controller.
  */
-extern void PID_Init(PID_Info_TypeDef *Pid,PID_Type_e type,float para[PID_PARAMETER_NUM]);
+extern void PID_Init(PID_Info_TypeDef *Pid, PID_Type_e type, float para[PID_PARAMETER_NUM]);
 /**
-  * @brief  Caculate the PID Controller
-  */
-extern float PID_Calculate(PID_Info_TypeDef *PID, float Target,float Measure);
+ * @brief  Caculate the PID Controller
+ */
+extern float PID_Calculate(PID_Info_TypeDef *PID, float Target, float Measure);
 
-#endif //CONTROLLER_PID_H
-
-
+#endif // CONTROLLER_PID_H
