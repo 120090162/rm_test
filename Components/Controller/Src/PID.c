@@ -17,20 +17,20 @@
 /* Includes ------------------------------------------------------------------*/
 
 /**
- * @brief ³õÊ¼»¯PID²ÎÊı.
- * @Param PID: Ö¸ÏòPID_Info_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄĞÅÏ¢.
- * @Param Param: Ö¸ÏòPID²ÎÊıµÄ¸¡µãÊıÖ¸Õë£¬°üº¬PID²ÎÊıĞÅÏ¢.
- * @retval PID´íÎó×´Ì¬.
+ * @brief åˆå§‹åŒ–PIDå‚æ•°.
+ * @Param PID: æŒ‡å‘PID_Info_TypeDefç»“æ„çš„æŒ‡é’ˆï¼ŒåŒ…å«PIDæ§åˆ¶å™¨çš„ä¿¡æ¯.
+ * @Param Param: æŒ‡å‘PIDå‚æ•°çš„æµ®ç‚¹æ•°æŒ‡é’ˆï¼ŒåŒ…å«PIDå‚æ•°ä¿¡æ¯.
+ * @retval PIDé”™è¯¯çŠ¶æ€.
  */
 static PID_Status_e PID_Param_Init(PID_Info_TypeDef *PID,float Param[PID_PARAMETER_NUM])
 {
-    //ÅĞ¶ÏPIDÀàĞÍºÍ²ÎÊıÊÇ·ñÎª¿Õ ÈôÎª¿Õ ·µ»ØPID_FAILED_INIT£¨³õÊ¼»¯Ê§°Ü£©
+    //åˆ¤æ–­PIDç±»å‹å’Œå‚æ•°æ˜¯å¦ä¸ºç©º è‹¥ä¸ºç©º è¿”å›PID_FAILED_INITï¼ˆåˆå§‹åŒ–å¤±è´¥ï¼‰
     if(PID->Type == PID_Type_None || Param == NULL)
     {
       return PID_FAILED_INIT;
     }
     
-    //³õÊ¼»¯PID²ÎÊı
+    //åˆå§‹åŒ–PIDå‚æ•°
     PID->Param.KP = Param[0];
     PID->Param.KI = Param[1];
     PID->Param.KD = Param[2];
@@ -42,23 +42,23 @@ static PID_Status_e PID_Param_Init(PID_Info_TypeDef *PID,float Param[PID_PARAMET
     PID->Param.LimitIntegral = Param[5];
     PID->Param.LimitOutput = Param[6];
 
-    //Çå³ıPID´íÎó¼ÆÊı
+    //æ¸…é™¤PIDé”™è¯¯è®¡æ•°
     PID->ERRORHandler.ErrorCount = 0;
 
-		//·µ»ØPID_ERROR_NONE£¨ÎŞ´íÎó×´Ì¬£©
+		//è¿”å›PID_ERROR_NONEï¼ˆæ— é”™è¯¯çŠ¶æ€ï¼‰
     return PID_ERROR_NONE;
 }
 //------------------------------------------------------------------------------
 
 
 /**
- * @brief Çå³ıPID¼ÆËãÖµ£¬½«ËùÓĞÊä³ö¸³0.
- * @Param PID: Ö¸ÏòPID_Info_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄĞÅÏ¢.
- * @retval ÎŞ.
+ * @brief æ¸…é™¤PIDè®¡ç®—å€¼ï¼Œå°†æ‰€æœ‰è¾“å‡ºèµ‹0.
+ * @Param PID: æŒ‡å‘PID_Info_TypeDefç»“æ„çš„æŒ‡é’ˆï¼ŒåŒ…å«PIDæ§åˆ¶å™¨çš„ä¿¡æ¯.
+ * @retval æ— .
  */
 static void PID_Calc_Clear(PID_Info_TypeDef *PID)
 {
-	//½«ËùÓĞÊä³ö¸³0
+	//å°†æ‰€æœ‰è¾“å‡ºèµ‹0
 	memset(PID->Err,0,sizeof(PID->Err));
 	PID->Integral = 0;
 		
@@ -71,11 +71,11 @@ static void PID_Calc_Clear(PID_Info_TypeDef *PID)
 
 
 /**
- * @brief ³õÊ¼»¯PID¿ØÖÆÆ÷.
- * @Param PID: Ö¸ÏòPID_Info_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄĞÅÏ¢.
- * @Param Type: PID¿ØÖÆÆ÷ÀàĞÍ.
- * @Param Param:Ö¸ÏòPID²ÎÊıµÄ¸¡µãÊıÖ¸Õë£¬°üº¬PID²ÎÊıĞÅÏ¢.
- * @retval PID´íÎó×´Ì¬.
+ * @brief åˆå§‹åŒ–PIDæ§åˆ¶å™¨.
+ * @Param PID: æŒ‡å‘PID_Info_TypeDefç»“æ„çš„æŒ‡é’ˆï¼ŒåŒ…å«PIDæ§åˆ¶å™¨çš„ä¿¡æ¯.
+ * @Param Type: PIDæ§åˆ¶å™¨ç±»å‹.
+ * @Param Param:æŒ‡å‘PIDå‚æ•°çš„æµ®ç‚¹æ•°æŒ‡é’ˆï¼ŒåŒ…å«PIDå‚æ•°ä¿¡æ¯.
+ * @retval PIDé”™è¯¯çŠ¶æ€.
  */
 void PID_Init(PID_Info_TypeDef *PID,PID_Type_e Type,float Param[PID_PARAMETER_NUM])
 {
@@ -92,9 +92,9 @@ void PID_Init(PID_Info_TypeDef *PID,PID_Type_e Type,float Param[PID_PARAMETER_NU
 
 
 /**
-  * @brief ÅĞ¶ÏPID´íÎó×´Ì¬
-  * @Param PID: Ö¸ÏòPID_Info_TypeDef½á¹¹µÄÖ¸Õë£¬°üº¬PID¿ØÖÆÆ÷µÄĞÅÏ¢.
-  * @retval ÎŞ.
+  * @brief åˆ¤æ–­PIDé”™è¯¯çŠ¶æ€
+  * @Param PID: æŒ‡å‘PID_Info_TypeDefç»“æ„çš„æŒ‡é’ˆï¼ŒåŒ…å«PIDæ§åˆ¶å™¨çš„ä¿¡æ¯.
+  * @retval æ— .
   */
 static void PID_ErrorHandle(PID_Info_TypeDef *PID)
 {
@@ -107,7 +107,7 @@ static void PID_ErrorHandle(PID_Info_TypeDef *PID)
 //------------------------------------------------------------------------------
 
 /**
-  * @brief  PID¿ØÖÆÆ÷¼ÆËãº¯Êı
+  * @brief  PIDæ§åˆ¶å™¨è®¡ç®—å‡½æ•°
   * @Param  *PID pointer to a PID_TypeDef_t structure that contains
   *              the configuration information for the specified PID. 
   * @Param  Target  Target for the PID controller

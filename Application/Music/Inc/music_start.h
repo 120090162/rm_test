@@ -6,4 +6,4 @@
 
 extern MusicInfo_s MusicStartInit(void);
 
-#endif  // MUSIC_START_H
+#endif // MUSIC_START_H

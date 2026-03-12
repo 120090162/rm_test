@@ -536,11 +536,6 @@
               <FilePath>..\Components\Algorithm\Src\Kalman_Filter.c</FilePath>
             </File>
             <File>
-              <FileName>Quaternion.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Components\Algorithm\Src\Quaternion.c</FilePath>
-            </File>
-            <File>
               <FileName>LPF.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Components\Algorithm\Src\LPF.c</FilePath>
@@ -564,6 +559,16 @@
               <FileName>KFIFO.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Components\Algorithm\Src\KFIFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>Mahony_Filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Components\Algorithm\Src\Mahony_Filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>QuaternionEKF.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Components\Algorithm\Src\QuaternionEKF.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2988,6 +2993,11 @@
               <FileName>music_crychic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\Music\Src\music_crychic.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_vbat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Music\Src\music_vbat.c</FilePath>
             </File>
           </Files>
         </Group>

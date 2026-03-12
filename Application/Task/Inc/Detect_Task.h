@@ -18,5 +18,16 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
+#include <stdbool.h>
+
+#define VBAT_WARNNING_VAL_6S 22.0f
+#define VBAT_LOW_VAL_6S 21.0f
+
+extern float VBAT_WARNNING_VAL;
+extern float VBAT_LOW_VAL;
+extern float vbus;
+extern bool vbus_low_warning;
+
+extern uint16_t adc_val[2];
 
 #endif // DETECT_TASK_H

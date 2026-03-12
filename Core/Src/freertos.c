@@ -138,13 +138,13 @@ void MX_FREERTOS_Init(void)
 	osThreadStaticDef(Start_INS_Task, INS_Task, osPriorityHigh, 0, 2048, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
 	Start_INS_TaskHandle = osThreadCreate(osThread(Start_INS_Task), NULL);
 
-	/* definition and creation of Start_Control_Task */
-	osThreadStaticDef(Start_Control_Task, Control_Task, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
-	Start_Control_TaskHandle = osThreadCreate(osThread(Start_Control_Task), NULL);
+	// /* definition and creation of Start_Control_Task */
+	// osThreadStaticDef(Start_Control_Task, Control_Task, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
+	// Start_Control_TaskHandle = osThreadCreate(osThread(Start_Control_Task), NULL);
 
-	/* definition and creation of Start_CAN_Task */
-	osThreadStaticDef(Start_CAN_Task, CAN_Task, osPriorityNormal, 0, 2048, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
-	Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
+	// /* definition and creation of Start_CAN_Task */
+	// osThreadStaticDef(Start_CAN_Task, CAN_Task, osPriorityNormal, 0, 2048, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
+	// Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
 
 	/* definition and creation of Start_Music_Task */
 	osThreadStaticDef(Start_Music_Task, Music_Task, osPriorityNormal, 0, 256, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);

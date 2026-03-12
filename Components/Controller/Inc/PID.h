@@ -18,7 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "Config.h"
-#include "lpf.h"
+#include "LPF.h"
 /* Exported defines -----------------------------------------------------------*/
 /**
  * @brief macro definition of the VAL_LIMIT that restricts the value of the specified variable.
@@ -84,13 +84,13 @@ typedef struct
  */
 typedef struct
 {
-	float KP;			 // ����ϵ��
-	float KI;			 // ����ϵ��
-	float KD;			 // ΢��ϵ��
-	float Alpha;		 // ΢��һ���˲���ϵ��
-	float Deadband;		 // ���� ��������ֵС������ PIDֹͣ���㡣
-	float LimitIntegral; // �����޷�
-	float LimitOutput;	 // ������޷�
+	float KP;			 // 比例系数
+	float KI;			 // 积分系数
+	float KD;			 // 微分系数
+	float Alpha;		 // 微分项一阶低通滤波系数
+	float Deadband;		 // 死区：当误差绝对值小于该值时，PID停止计算
+	float LimitIntegral; // 积分限幅 (抗积分饱和)
+	float LimitOutput;	 // 输出限幅
 } PID_Parameter_Typedef;
 
 /**
@@ -98,35 +98,35 @@ typedef struct
  */
 typedef struct _PID_TypeDef
 {
-	PID_Type_e Type; // PID���� λ��ʽor����ʽ ͨ��ʹ��λ��ʽ
+	PID_Type_e Type; // PID类型：位置式 or 增量式 (通常使用位置式)
 
-	float Target;  // Ŀ��ֵ
-	float Measure; // ʵ��ֵ
+	float Target;  // 目标值
+	float Measure; // 实际值 (测量值)
 
-	float Err[3];	// ��� Ŀ��ֵ-����ֵ = ��� ��ǰ�Լ���ȥ���ε����
-	float Integral; // ������ֵ ����ۼ�
-	float Pout;		// KP * ���ֵ �������
-	float Iout;		// KI * ������ �������
-	float Dout;		// KD * ���΢�֣���֣�΢�����
-	float Output;	// ����� Pout + Iout + Dout = Output
+	float Err[3];	// 误差：目标值 - 实际值 = 误差 (数组保存当前、上次以及上上次的误差)
+	float Integral; // 积分数值：误差累计值
+	float Pout;		// KP * 误差值 = 比例输出
+	float Iout;		// KI * 积分值 = 积分输出
+	float Dout;		// KD * 误差微分(差分) = 微分输出
+	float Output;	// 总输出：Pout + Iout + Dout = Output
 
-	LowPassFilter1p_Info_TypeDef Dout_LPF; // ΢�������һ���˲���
+	LowPassFilter1p_Info_TypeDef Dout_LPF; // 微分输出的一阶低通滤波器
 
-	PID_Parameter_Typedef Param;		   // PID�����ṹ��
-	PID_ErrorHandler_Typedef ERRORHandler; // PID�������ṹ��
+	PID_Parameter_Typedef Param;		   // PID参数结构体
+	PID_ErrorHandler_Typedef ERRORHandler; // PID错误处理结构体
 
 	/**
-	 * @brief ��ʼ��PID�����ĺ���ָ�룬��PID����װ����PID�����ṹ���С�
-	 * @param PID: ָ��_pid_TypeDef�ṹ��ָ�룬����PID����������Ϣ��
-	 * @param Param: ָ��PID�����ĸ�����ָ�룬����PID������
-	 * @retval PID����״̬ ����PID�Ƿ��ʼ���ɹ���
+	 * @brief 初始化PID参数的函数指针，将传入的参数装载到PID参数结构体中。
+	 * @param PID: 指向 _PID_TypeDef 结构体指针，包含PID控制器的所有信息。
+	 * @param Param: 指向包含PID参数的浮点型数组指针。
+	 * @retval PID错误状态，返回PID是否初始化成功。
 	 */
 	PID_Status_e (*PID_Param_Init)(struct _PID_TypeDef *PID, float *Param);
 
 	/**
-	 * @brief ���pid���㺯���ļ��ָ�롣
-	 * @param PID:ָ��_pid_TypeDef�ṹ��ָ�룬����PID����������Ϣ��
-	 * @retval ��.
+	 * @brief 清除PID计算历史数据(如误差、积分等)的函数指针。
+	 * @param PID: 指向 _PID_TypeDef 结构体指针，包含PID控制器的所有信息。
+	 * @retval 无
 	 */
 	void (*PID_Calc_Clear)(struct _PID_TypeDef *PID);
 

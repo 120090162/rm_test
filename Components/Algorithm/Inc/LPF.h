@@ -1,15 +1,15 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : lowpass_filter.c
-  * @brief          : lowpass filter 
-  * @author         : Yan Yuanbin
-  * @date           : 2023/04/27
-  * @version        : v1.0
-  ******************************************************************************
-  * @attention      : To be perfected
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : lowpass_filter.c
+ * @brief          : lowpass filter
+ * @author         : Yan Yuanbin
+ * @date           : 2023/04/27
+ * @version        : v1.0
+ ******************************************************************************
+ * @attention      : To be perfected
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -17,55 +17,56 @@
 #define LOWPASS_FILTER_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "config.h"
+#include "Config.h"
 
-/* Exported types ------------------------------------------------------------*/
-/**
- * @brief  Ò»½×µÍÍ¨ÂË²¨Æ÷ĞÅÏ¢µÄ½á¹¹Ìå
- */
-typedef struct
-{
-	bool Initialized;       //³õÊ¼»¯±êÖ¾ 0:Î´³õÊ¼»¯ 1£º³õÊ¼»¯
-    float Input;          //µ±Ç°ÊäÈë
-    float Output;         //Êä³ö
-    float Alpha;          //ÂË²¨ÏµÊı
-}LowPassFilter1p_Info_TypeDef;
+	/* Exported types ------------------------------------------------------------*/
+	/**
+	 * @brief  ä¸€é˜¶ä½é€šæ»¤æ³¢å™¨ç»“æ„ä½“
+	 */
+	typedef struct
+	{
+		bool Initialized; // åˆå§‹åŒ–æ ‡å¿— 0:æœªåˆå§‹åŒ– 1ï¼šåˆå§‹åŒ–
+		float Input;	  // å½“å‰è¾“å…¥
+		float Output;	  // è¾“å‡º
+		float Alpha;	  // æ»¤æ³¢ç³»æ•°
+	} LowPassFilter1p_Info_TypeDef;
 
-/**
- * @brief ¶ş½×µÍÍ¨ÂË²¨Æ÷ĞÅÏ¢µÄ½á¹¹Ìå.
- */
+	/**
+	 * @brief äºŒé˜¶ä½é€šæ»¤æ³¢å™¨ä¿¡æ¯çš„ç»“æ„ä½“.
+	 */
 
-typedef struct 
-{
-    bool Initialized;  //³õÊ¼»¯±êÖ¾ 0:Î´³õÊ¼»¯ 1£º³õÊ¼»¯
-    float Input;       //µ±Ç°ÊäÈë
-    float Output[3];   //Êä³ö ÏÖÔÚºÍ¹ıÈ¥Á½´ÎµÄÊä³ö
-    float Alpha[3];    //¶ş½×ÂË²¨Æ÷ÏµÊı
+	typedef struct
+	{
+		bool Initialized; // åˆå§‹åŒ–æ ‡å¿— 0:æœªåˆå§‹åŒ– 1ï¼šåˆå§‹åŒ–
+		float Input;	  // å½“å‰è¾“å…¥
+		float Output[3];  // è¾“å‡º ç°åœ¨å’Œè¿‡å»ä¸¤æ¬¡çš„è¾“å‡º
+		float Alpha[3];	  // äºŒé˜¶æ»¤æ³¢å™¨ç³»æ•°
 
-}LowPassFilter2p_Info_TypeDef;
+	} LowPassFilter2p_Info_TypeDef;
 
-/* Extern Functions Prototypes ---------------------------------------------*/
+	/* Extern Functions Prototypes ---------------------------------------------*/
 
-/**
-  * @brief ¸ù¾İº¯ÊıÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯Ò»½×µÍÍ¨ÂË²¨Æ÷.
-  */
-extern void LowPassFilter1p_Init(LowPassFilter1p_Info_TypeDef *LPF,float Alpha);
-/**
-  * @brief ¸ù¾İº¯ÊıÖĞÖ¸¶¨µÄ²ÎÊı¸üĞÂ£¨¼ÆËã£©Ò»½×µÍÍ¨ÂË²¨Æ÷
-  */
-extern float LowPassFilter1p_Update(LowPassFilter1p_Info_TypeDef *lpf,float input);
-/**
-  * @brief ¸ù¾İº¯ÊıÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯¶ş½×µÍÍ¨ÂË²¨Æ÷
-  */
-extern void  LowPassFilter2p_Init(LowPassFilter2p_Info_TypeDef *lpf,float alpha[3]);
-/**
-  * @brief ¸ù¾İº¯ÊıÖĞÖ¸¶¨µÄ²ÎÊı¸üĞÂ£¨¼ÆËã£©¶ş½×µÍÍ¨ÂË²¨Æ÷
-  */
-extern float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *lpf,float input);
+	/**
+	 * @brief æ ¹æ®å‡½æ•°ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–ä¸€é˜¶ä½é€šæ»¤æ³¢å™¨.
+	 */
+	extern void LowPassFilter1p_Init(LowPassFilter1p_Info_TypeDef *LPF, float Alpha);
+	/**
+	 * @brief æ ¹æ®å‡½æ•°ä¸­æŒ‡å®šçš„å‚æ•°æ›´æ–°ï¼ˆè®¡ç®—ï¼‰ä¸€é˜¶ä½é€šæ»¤æ³¢å™¨
+	 */
+	extern float LowPassFilter1p_Update(LowPassFilter1p_Info_TypeDef *lpf, float input);
+	/**
+	 * @brief æ ¹æ®å‡½æ•°ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–äºŒé˜¶ä½é€šæ»¤æ³¢å™¨
+	 */
+	extern void LowPassFilter2p_Init(LowPassFilter2p_Info_TypeDef *lpf, float alpha[3]);
+	/**
+	 * @brief æ ¹æ®å‡½æ•°ä¸­æŒ‡å®šçš„å‚æ•°æ›´æ–°ï¼ˆè®¡ç®—ï¼‰äºŒé˜¶ä½é€šæ»¤æ³¢å™¨
+	 */
+	extern float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *lpf, float input);
 
-extern float sign(float input);
-#endif //LOWPASS_FILTER_H
+	extern float sign(float input);
+#endif // LOWPASS_FILTER_H

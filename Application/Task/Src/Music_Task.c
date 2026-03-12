@@ -1,4 +1,4 @@
-#include "music_task.h"
+#include "Music_Task.h"
 #include "cmsis_os.h"
 
 #include "bsp_buzzer.h"
@@ -23,6 +23,7 @@
 #include "music_unity.h"
 #include "music_you.h"
 #include "music_crychic.h"
+#include "music_vbat.h"
 // #include "referee.h"
 #include "Remote_Control.h"
 #include "stm32h7xx_hal.h"
@@ -31,14 +32,16 @@
 uint32_t music_high_water;
 #endif
 
-#define ABNORMAL_WARNING_INTERVAL 5000 // ms
+#define ABNORMAL_WARNING_INTERVAL 3000 // ms
 
 // 启用遥控器离线报警
-#define ENABLE_ALARM_RC_OFFLINE true
+#define ENABLE_ALARM_RC_OFFLINE false
 // 启用电机离线报警
 #define ENABLE_ALARM_MOTOR_OFFLINE false
 // 启用裁判系统离线检测
 #define ENABLE_CHECK_REFEREE_OFFLINE false
+// 启用电池电压过低报警
+#define ENABLE_ALARM_VBAT_LOW false
 
 #define STEP_INIT 1
 #define STEP_NORMAL 2
@@ -69,6 +72,7 @@ typedef enum
     PLAY_MOTOR_OFFLINE,
     PLAY_RC_OFFLINE,
     REFEREE_OFFLINE,
+    VBAT_LOW,
 } Playing_e;
 
 typedef enum
@@ -88,6 +92,7 @@ typedef enum
     unity,
     you,
     crychic,
+    vbat_low,
 } MusicIndex_e;
 
 // Variable Declarations
@@ -186,6 +191,7 @@ static void MusicInit(void)
     MUSICS[hao_yun_lai]       = MusicHaoYunLaiInit();
     MUSICS[gong_xi_fa_cai]    = MusicGongXiFaCaiInit();
     MUSICS[crychic]           = MusicCrychicInit();
+    MUSICS[vbat_low]             = MusicVBatLowInit();
     // MUSICS[deja_vu]           = MusicDejaVuInit();
     // clang-format on
 }
@@ -219,6 +225,11 @@ static void MusicPlay(void)
             // { // 检测裁判系统是否离线
             //     __kfifo_put(&play_list_fifo, (unsigned char *)&REFEREE_OFFLINE, sizeof(REFEREE_OFFLINE));
             // }
+            if (ENABLE_ALARM_VBAT_LOW && vbus_low_warning)
+            { // 检测电池电压过低
+                is_play = VBAT_LOW;
+                __kfifo_put(play_list_fifo, (unsigned char *)&is_play, sizeof(is_play));
+            }
         }
 
         // 播放列表内容
@@ -258,6 +269,12 @@ static void MusicPlay(void)
                 is_play = PLAY_NONE;
         }
         break;
+
+        case VBAT_LOW:
+        {
+            if (PlayMusic(&MUSICS[vbat_low], 0.5f))
+                is_play = PLAY_NONE;
+        }
 
         default:
         {

@@ -1,4 +1,4 @@
-#include "music_start.h"
+#include "music_vbat.h"
 
 #include "bsp_buzzer.h"
 #include "music.h"
@@ -53,18 +53,15 @@ static MusicInfo_s MUSIC_INFO;
 
 /*-------------------- User functions --------------------*/
 
-MusicInfo_s MusicStartInit(void)
+MusicInfo_s MusicVBatLowInit(void)
 {
     MUSIC_INFO.notes = Notes;
 
     WRITE_NOTE(0, 2);
-    WRITE_NOTE(B1, HalfBeat * 2);
+    WRITE_NOTE(D2, OneBeat * 2);
     WRITE_NOTE(0, 3);
-    WRITE_NOTE(C3, HalfBeat * 2);
-    WRITE_NOTE(0, 3);
-    WRITE_NOTE(D5, HalfBeat * 2);
-    WRITE_NOTE(0, 15);
-    WRITE_NOTE(D1, HalfBeat * 5);
+    WRITE_NOTE(C4, OneBeat * 2);
+    WRITE_NOTE(0, 1000);
 
     return MUSIC_INFO;
 }

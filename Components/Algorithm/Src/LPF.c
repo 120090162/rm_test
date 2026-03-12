@@ -1,98 +1,96 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : LPF.c
-  * @brief          : lowpass filter 
-  * @author         : GrassFan Wang
-  * @date           : 2025/12/28
-  * @version        : v1.0
-  ******************************************************************************
-  * @attention      : To be perfected
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : LPF.c
+ * @brief          : lowpass filter
+ * @author         : GrassFan Wang
+ * @date           : 2025/12/28
+ * @version        : v1.0
+ ******************************************************************************
+ * @attention      : To be perfected
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "LPF.h"
 
-
-float sign(float input){
-   return (input>0.0f) - (input<0.0f);
-
-}
-
-/**
-  * @brief ³õÊ¼»¯Ò»½×µÍÍ¨ÂË²¨Æ÷.
-  * @param LPF: Ò»½×µÍÍ¨ÂË²¨Æ÷½á¹¹Ìå.
-  * @param Alpha: ÂË²¨Æ÷ÏµÊý.
-  * @param Frame_Period: ²ÉÑùÖÜÆÚ.
-  * @retval ÎÞ.
-  */
-void LowPassFilter1p_Init(LowPassFilter1p_Info_TypeDef *LPF,float Alpha)
+float sign(float input)
 {
-  LPF->Alpha = Alpha;
-  LPF->Input = 0;
-  LPF->Output = 0;
+	return (input > 0.0f) - (input < 0.0f);
 }
 
 /**
-  * @brief ¸üÐÂÒ»½×µÍÍ¨ÂË²¨Æ÷Êý¾Ý.
-  * @param Input: µ±Ç°ÊäÈë.
-  * @retval ÂË²¨ºóµÄÖµ.
-  */
-float LowPassFilter1p_Update(LowPassFilter1p_Info_TypeDef *LPF,float Input)
+ * @brief åˆå§‹åŒ–ä¸€é˜¶ä½Žé€šæ»¤æ³¢å™¨.
+ * @param LPF: ä¸€é˜¶ä½Žé€šæ»¤æ³¢å™¨ç»“æž„ä½“.
+ * @param Alpha: æ»¤æ³¢å™¨ç³»æ•°.
+ * @param Frame_Period: é‡‡æ ·å‘¨æœŸ.
+ * @retval æ— .
+ */
+void LowPassFilter1p_Init(LowPassFilter1p_Info_TypeDef *LPF, float Alpha)
 {
-  LPF->Input = Input;
-
-  if(LPF->Initialized == false)
-  {
-    LPF->Output = LPF->Input;//µÚÒ»´Î½øÈë¸üÐÂº¯Êý Êä³öµÈÓÚÕâ´ÎÊäÈë
-    LPF->Initialized = true;
-  }
-
-	/*ÂË²¨Æ÷ÏµÊý = Alhpa 0< Alhpa <1 µ±ÂË²¨ÏµÊýÔ½Ð¡£¬ÂË²¨ÇúÏßÔ½Æ½ÎÈ£¬µ«ÊÇÖÍºóÐÔ¸ü´ó¡£
-                                   µ±ÂË²¨ÏµÊýÔ½´ó£¬ÂË²¨ÇúÏßÔ½½Ó½üÊµ¼ÊÖµ£¬ÖÍºóÐÔÐ¡£¬µ«ÊÇÂË²¨ÇúÏß¸ü¶¶ */
-	
-	//ÂË²¨Öµ = Alhpa * ÉÏÒ»´ÎÊä³ö + £¨1 - Alhpa)*Õâ´ÎÊäÈë	
-  LPF->Output = LPF->Alpha * LPF->Output +(1.f - LPF->Alpha) * LPF->Input;
-	
-  return LPF->Output;
+	LPF->Alpha = Alpha;
+	LPF->Input = 0;
+	LPF->Output = 0;
 }
 
 /**
-  * @brief ³õÊ¼»¯¶þ½×µÍÍ¨ÂË²¨Æ÷.
-  * @param Alpha[3]: ÂË²¨Æ÷ÏµÊý[3].
-  * @retval ÎÞ.
-  */
-void LowPassFilter2p_Init(LowPassFilter2p_Info_TypeDef *LPF,float Alpha[3])
-{
-  memcpy(LPF->Alpha,Alpha,sizeof(LPF->Alpha));
-  LPF->Input = 0;
-  memset(LPF->Output,0,sizeof(LPF->Output));
-}
-
-/**
-  * @brief ¸üÐÂ¶þ½×µÍÍ¨ÂË²¨Æ÷Êý¾Ý.
-  * @param Input: µ±Ç°ÊäÈë.
-  * @retval ÂË²¨ºóµÄÖµ.
-  */
-float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *LPF,float Input)
+ * @brief æ›´æ–°ä¸€é˜¶ä½Žé€šæ»¤æ³¢å™¨æ•°æ®.
+ * @param Input: å½“å‰è¾“å…¥.
+ * @retval æ»¤æ³¢åŽçš„å€¼.
+ */
+float LowPassFilter1p_Update(LowPassFilter1p_Info_TypeDef *LPF, float Input)
 {
 	LPF->Input = Input;
-  
-  if(LPF->Initialized == false)
-  {
-    LPF->Output[0] = LPF->Input;
-    LPF->Output[1] = LPF->Input;
-    LPF->Output[2] = LPF->Input;
-    LPF->Initialized = true;
-  }
-  
+
+	if (LPF->Initialized == false)
+	{
+		LPF->Output = LPF->Input; // ç¬¬ä¸€æ¬¡è¿›å…¥æ›´æ–°å‡½æ•° è¾“å‡ºç­‰äºŽè¿™æ¬¡è¾“å…¥
+		LPF->Initialized = true;
+	}
+
+	/*æ»¤æ³¢å™¨ç³»æ•° = Alhpa 0< Alhpa <1 å½“æ»¤æ³¢ç³»æ•°è¶Šå°ï¼Œæ»¤æ³¢æ›²çº¿è¶Šå¹³ç¨³ï¼Œä½†æ˜¯æ»žåŽæ€§æ›´å¤§ã€‚
+								   å½“æ»¤æ³¢ç³»æ•°è¶Šå¤§ï¼Œæ»¤æ³¢æ›²çº¿è¶ŠæŽ¥è¿‘å®žé™…å€¼ï¼Œæ»žåŽæ€§å°ï¼Œä½†æ˜¯æ»¤æ³¢æ›²çº¿æ›´æŠ– */
+
+	// æ»¤æ³¢å€¼ = Alhpa * ä¸Šä¸€æ¬¡è¾“å‡º + ï¼ˆ1 - Alhpa)*è¿™æ¬¡è¾“å…¥
+	LPF->Output = LPF->Alpha * LPF->Output + (1.f - LPF->Alpha) * LPF->Input;
+
+	return LPF->Output;
+}
+
+/**
+ * @brief åˆå§‹åŒ–äºŒé˜¶ä½Žé€šæ»¤æ³¢å™¨.
+ * @param Alpha[3]: æ»¤æ³¢å™¨ç³»æ•°[3].
+ * @retval æ— .
+ */
+void LowPassFilter2p_Init(LowPassFilter2p_Info_TypeDef *LPF, float Alpha[3])
+{
+	memcpy(LPF->Alpha, Alpha, sizeof(LPF->Alpha));
+	LPF->Input = 0;
+	memset(LPF->Output, 0, sizeof(LPF->Output));
+}
+
+/**
+ * @brief æ›´æ–°äºŒé˜¶ä½Žé€šæ»¤æ³¢å™¨æ•°æ®.
+ * @param Input: å½“å‰è¾“å…¥.
+ * @retval æ»¤æ³¢åŽçš„å€¼.
+ */
+float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *LPF, float Input)
+{
+	LPF->Input = Input;
+
+	if (LPF->Initialized == false)
+	{
+		LPF->Output[0] = LPF->Input;
+		LPF->Output[1] = LPF->Input;
+		LPF->Output[2] = LPF->Input;
+		LPF->Initialized = true;
+	}
+
 	LPF->Output[0] = LPF->Output[1];
 	LPF->Output[1] = LPF->Output[2];
-  LPF->Output[2] = LPF->Alpha[0] * LPF->Output[1] + LPF->Alpha[1] * LPF->Output[0] + LPF->Alpha[2] * LPF->Input;
+	LPF->Output[2] = LPF->Alpha[0] * LPF->Output[1] + LPF->Alpha[1] * LPF->Output[0] + LPF->Alpha[2] * LPF->Input;
 
 	return LPF->Output[2];
 }
 //------------------------------------------------------------------------------
-

@@ -73,11 +73,11 @@ typedef struct
 {
     bool Offsets_Init;
 
-    float Accel[3];
-    float Gyro[3];
-    float Temperature;
+    float Accel[3];    // real acceleration
+    float Gyro[3];     // real angular velocity
+    float Temperature; // real temperature
 
-    MPU_Info_Typedef MPU_Info;
+    MPU_Info_Typedef MPU_Info; // mpu raw data
 
     float Offsets_Gyro_X;
     float Offsets_Gyro_Y;

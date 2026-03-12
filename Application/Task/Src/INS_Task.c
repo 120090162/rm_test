@@ -13,50 +13,21 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "cmsis_os.h"
 #include "INS_Task.h"
-#include "Bmi088.h"
-#include "LPF.h"
-#include "pid.h"
-#include "Config.h"
-#include "tim.h"
-#include "Quaternion.h"
-#include "bsp_pwm.h"
 
 /**
  * @brief the structure that contains the information for the INS.
  */
-INS_Info_Typedef INS_Info;
+INS_t INS;
 
-/**
- * @brief the array that contains the data of LPF2p coefficients.
- */
-static float INS_LPF2p_Alpha[3] = {1.929454039488895f, -0.93178349823448126f, 0.002329458745586203f};
+struct MAHONY_FILTER_t mahony;
+Axis3f Gyro, Accel;
+float gravity[3] = {0, 0, 9.81f};
 
-/**
- * @brief the structure that contains the Information of accel LPF2p.
- */
-LowPassFilter2p_Info_TypeDef INS_AccelPF2p[3];
-
-/**
- * @brief the Initialize data of state transition matrix.
- */
-static float QuaternionEKF_A_Data[36] = {1, 0, 0, 0, 0, 0,
-										 0, 1, 0, 0, 0, 0,
-										 0, 0, 1, 0, 0, 0,
-										 0, 0, 0, 1, 0, 0,
-										 0, 0, 0, 0, 1, 0,
-										 0, 0, 0, 0, 0, 1};
-
-/**
- * @brief the Initialize data of posteriori covariance matrix.
- */
-static float QuaternionEKF_P_Data[36] = {100000, 0.1, 0.1, 0.1, 0.1, 0.1,
-										 0.1, 100000, 0.1, 0.1, 0.1, 0.1,
-										 0.1, 0.1, 100000, 0.1, 0.1, 0.1,
-										 0.1, 0.1, 0.1, 100000, 0.1, 0.1,
-										 0.1, 0.1, 0.1, 0.1, 100, 0.1,
-										 0.1, 0.1, 0.1, 0.1, 0.1, 100};
+uint32_t INS_DWT_Count = 0;
+float ins_dt = 0.0f;
+float ins_time = 0.0f;
+int stop_time = 0;
 
 /**
  * @brief the Initialize data of Temperature Control PID.
@@ -88,63 +59,110 @@ static void BMI088_Temp_Control(float temp);
 void INS_Task(void const *argument)
 {
 	/* USER CODE BEGIN INS_Task */
-	TickType_t INS_Task_SysTick = 0;
 
 	/* Initializes the INS_Task. */
 	INS_Task_Init();
 
 	/* Infinite loop */
-	for (;;)
+	while (1)
 	{
-		INS_Task_SysTick = osKernelSysTick();
+		ins_dt = DWT_GetDeltaT(&INS_DWT_Count);
+
+		mahony.dt = ins_dt;
 
 		/* Update the BMI088 measurement */
 		BMI088_Info_Update(&BMI088_Info);
 
-		/* Accel measurement LPF2p */
-		INS_Info.Accel[0] = LowPassFilter2p_Update(&INS_AccelPF2p[0], BMI088_Info.Accel[0]);
-		INS_Info.Accel[1] = LowPassFilter2p_Update(&INS_AccelPF2p[1], BMI088_Info.Accel[1]);
-		INS_Info.Accel[2] = LowPassFilter2p_Update(&INS_AccelPF2p[2], BMI088_Info.Accel[2]);
+		INS.Accel[AXIS_X] = BMI088_Info.Accel[AXIS_X];
+		INS.Accel[AXIS_Y] = BMI088_Info.Accel[AXIS_Y];
+		INS.Accel[AXIS_Z] = BMI088_Info.Accel[AXIS_Z];
+		Accel.x = BMI088_Info.Accel[AXIS_X];
+		Accel.y = BMI088_Info.Accel[AXIS_Y];
+		Accel.z = BMI088_Info.Accel[AXIS_Z];
+		INS.Gyro[AXIS_X] = BMI088_Info.Gyro[AXIS_X];
+		INS.Gyro[AXIS_Y] = BMI088_Info.Gyro[AXIS_Y];
+		INS.Gyro[AXIS_Z] = BMI088_Info.Gyro[AXIS_Z];
+		Gyro.x = BMI088_Info.Gyro[AXIS_X];
+		Gyro.y = BMI088_Info.Gyro[AXIS_Y];
+		Gyro.z = BMI088_Info.Gyro[AXIS_Z];
 
-		/* Update the INS gyro in radians */
-		INS_Info.Gyro[0] = BMI088_Info.Gyro[0];
-		INS_Info.Gyro[1] = BMI088_Info.Gyro[1];
-		INS_Info.Gyro[2] = BMI088_Info.Gyro[2];
+		mahony_input(&mahony, Gyro, Accel);
+		mahony_update(&mahony);
+		mahony_output(&mahony);
+		RotationMatrix_update(&mahony);
 
-		/* Update the QuaternionEKF */
-		QuaternionEKF_Update(&Quaternion_Info, INS_Info.Gyro, INS_Info.Accel, 0.001f);
+		INS.q[0] = mahony.q0;
+		INS.q[1] = mahony.q1;
+		INS.q[2] = mahony.q2;
+		INS.q[3] = mahony.q3;
 
-		memcpy(INS_Info.Angle, Quaternion_Info.EulerAngle, sizeof(INS_Info.Angle));
-
-		/* Update the Euler angle in degrees. */
-		INS_Info.Pitch_Angle = Quaternion_Info.EulerAngle[IMU_ANGLE_INDEX_PITCH] * 57.295779513f;
-		INS_Info.Yaw_Angle = Quaternion_Info.EulerAngle[IMU_ANGLE_INDEX_YAW] * 57.295779513f;
-		INS_Info.Roll_Angle = Quaternion_Info.EulerAngle[IMU_ANGLE_INDEX_ROLL] * 57.295779513f;
-
-		/* Update the yaw total angle */
-		if (INS_Info.Yaw_Angle - INS_Info.Last_Yaw_Angle < -180.f)
+		// 将重力从导航系(n系)转换到机体系(b系)，从加速度计中减去重力，得到机体的纯运动加速度
+		float gravity_b[3];
+		EarthFrameToBodyFrame(gravity, gravity_b, INS.q);
+		for (uint8_t i = 0; i < 3; i++) // 同时过一个一阶低通滤波
 		{
-			INS_Info.YawRoundCount++;
+			INS.MotionAccel_b[i] = (INS.Accel[i] - gravity_b[i]) * ins_dt / (INS.AccelLPF + ins_dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + ins_dt);
+			//			INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt)
+			//														+ INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
 		}
-		else if (INS_Info.Yaw_Angle - INS_Info.Last_Yaw_Angle > 180.f)
+		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // 再转换回导航系(n系)
+
+		// 加速度死区处理 (滤除微小震动和零偏)
+		if (fabsf(INS.MotionAccel_n[0]) < 0.02f)
 		{
-			INS_Info.YawRoundCount--;
+			INS.MotionAccel_n[0] = 0.0f; // x轴
 		}
-		INS_Info.Last_Yaw_Angle = INS_Info.Yaw_Angle;
+		if (fabsf(INS.MotionAccel_n[1]) < 0.02f)
+		{
+			INS.MotionAccel_n[1] = 0.0f; // y轴
+		}
+		if (fabsf(INS.MotionAccel_n[2]) < 0.04f)
+		{
+			INS.MotionAccel_n[2] = 0.0f; // z轴
+			stop_time++;
+		}
+		//		if(stop_time>10)
+		//		{ // 静止10ms
+		//		  stop_time=0;
+		//			INS.v_n=0.0f; // 速度清零
+		//		}
 
-		INS_Info.Yaw_TolAngle = INS_Info.Yaw_Angle + INS_Info.YawRoundCount * 360.f;
+		if (ins_time > 3000.0f)
+		{
+			INS.v_n = INS.v_n + INS.MotionAccel_n[1] * 0.001f;
+			INS.x_n = INS.x_n + INS.v_n * 0.001f;
+			INS.ins_flag = 1; // 滤波器收敛完成，加速度也已稳定，标志位置1，系统可以开始正常控制
 
-		/* Update the INS gyro in degrees */
-		INS_Info.Pitch_Gyro = INS_Info.Gyro[IMU_GYRO_INDEX_PITCH] * RadiansToDegrees;
-		INS_Info.Yaw_Gyro = INS_Info.Gyro[IMU_GYRO_INDEX_YAW] * RadiansToDegrees;
-		INS_Info.Roll_Gyro = INS_Info.Gyro[IMU_GYRO_INDEX_ROLL] * RadiansToDegrees;
+			// 获取欧拉角(姿态角)
+			INS.Roll = mahony.roll;
+			INS.Pitch = mahony.pitch;
+			INS.Yaw = mahony.yaw;
 
-		if (INS_Task_SysTick % 5 == 0)
+			// INS.YawTotalAngle=INS.YawTotalAngle+INS.Gyro[2]*0.001f;
+
+			// 处理 Yaw 角过零点的问题 (将 -180~180 的角度转换为连续的累计角度)
+			if (INS.Yaw - INS.YawAngleLast > 3.1415926f)
+			{
+				INS.YawRoundCount--;
+			}
+			else if (INS.Yaw - INS.YawAngleLast < -3.1415926f)
+			{
+				INS.YawRoundCount++;
+			}
+			INS.YawTotalAngle = 6.283f * INS.YawRoundCount + INS.Yaw;
+			INS.YawAngleLast = INS.Yaw;
+		}
+		else
+		{
+			ins_time++; // 等待系统初始化和滤波收敛
+		}
+
+		if (INS_DWT_Count % 5 == 0)
 		{
 			BMI088_Temp_Control(BMI088_Info.Temperature);
 		}
 
-		osDelayUntil(&INS_Task_SysTick, 1);
+		osDelay(1);
 	}
 	/* USER CODE END INS_Task */
 }
@@ -154,16 +172,11 @@ void INS_Task(void const *argument)
  */
 static void INS_Task_Init(void)
 {
-	/* Initializes the Second order lowpass filter  */
-	LowPassFilter2p_Init(&INS_AccelPF2p[0], INS_LPF2p_Alpha);
-	LowPassFilter2p_Init(&INS_AccelPF2p[1], INS_LPF2p_Alpha);
-	LowPassFilter2p_Init(&INS_AccelPF2p[2], INS_LPF2p_Alpha);
+	mahony_init(&mahony, 1.0f, 0.0f, 0.001f);
+	INS.AccelLPF = 0.0089f;
 
 	/* Initializes the Temperature Control PID  */
 	PID_Init(&TempCtrl_PID, PID_POSITION, TemCtrl_PID_Param);
-
-	/* Initializes the Quaternion EKF */
-	QuaternionEKF_Init(&Quaternion_Info, 10.f, 0.001f, 1000000.f, QuaternionEKF_A_Data, QuaternionEKF_P_Data);
 }
 //------------------------------------------------------------------------------
 /**
@@ -180,3 +193,45 @@ static void BMI088_Temp_Control(float Temp)
 	Heat_Power_Control((uint16_t)(TempCtrl_PID.Output));
 }
 //------------------------------------------------------------------------------
+
+/**
+ * @brief          Transform 3dvector from BodyFrame to EarthFrame
+ * @param[1]       vector in BodyFrame
+ * @param[2]       vector in EarthFrame
+ * @param[3]       quaternion
+ */
+void BodyFrameToEarthFrame(const float *vecBF, float *vecEF, float *q)
+{
+	vecEF[0] = 2.0f * ((0.5f - q[2] * q[2] - q[3] * q[3]) * vecBF[0] +
+					   (q[1] * q[2] - q[0] * q[3]) * vecBF[1] +
+					   (q[1] * q[3] + q[0] * q[2]) * vecBF[2]);
+
+	vecEF[1] = 2.0f * ((q[1] * q[2] + q[0] * q[3]) * vecBF[0] +
+					   (0.5f - q[1] * q[1] - q[3] * q[3]) * vecBF[1] +
+					   (q[2] * q[3] - q[0] * q[1]) * vecBF[2]);
+
+	vecEF[2] = 2.0f * ((q[1] * q[3] - q[0] * q[2]) * vecBF[0] +
+					   (q[2] * q[3] + q[0] * q[1]) * vecBF[1] +
+					   (0.5f - q[1] * q[1] - q[2] * q[2]) * vecBF[2]);
+}
+
+/**
+ * @brief          Transform 3dvector from EarthFrame to BodyFrame
+ * @param[1]       vector in EarthFrame
+ * @param[2]       vector in BodyFrame
+ * @param[3]       quaternion
+ */
+void EarthFrameToBodyFrame(const float *vecEF, float *vecBF, float *q)
+{
+	vecBF[0] = 2.0f * ((0.5f - q[2] * q[2] - q[3] * q[3]) * vecEF[0] +
+					   (q[1] * q[2] + q[0] * q[3]) * vecEF[1] +
+					   (q[1] * q[3] - q[0] * q[2]) * vecEF[2]);
+
+	vecBF[1] = 2.0f * ((q[1] * q[2] - q[0] * q[3]) * vecEF[0] +
+					   (0.5f - q[1] * q[1] - q[3] * q[3]) * vecEF[1] +
+					   (q[2] * q[3] + q[0] * q[1]) * vecEF[2]);
+
+	vecBF[2] = 2.0f * ((q[1] * q[3] + q[0] * q[2]) * vecEF[0] +
+					   (q[2] * q[3] - q[0] * q[1]) * vecEF[1] +
+					   (0.5f - q[1] * q[1] - q[2] * q[2]) * vecEF[2]);
+}
