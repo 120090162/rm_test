@@ -4,7 +4,8 @@
 #include "bsp_buzzer.h"
 // #include "data_exchange.h"
 #include "KFIFO.h"
-// #include "motor.h"
+#include "Motor.h"
+#include "Config.h"
 #include "music.h"
 #include "music_calibrate.h"
 #include "music_canon.h"
@@ -33,15 +34,6 @@ uint32_t music_high_water;
 #endif
 
 #define ABNORMAL_WARNING_INTERVAL 3000 // ms
-
-// 启用遥控器离线报警
-#define ENABLE_ALARM_RC_OFFLINE false
-// 启用电机离线报警
-#define ENABLE_ALARM_MOTOR_OFFLINE false
-// 启用裁判系统离线检测
-#define ENABLE_CHECK_REFEREE_OFFLINE false
-// 启用电池电压过低报警
-#define ENABLE_ALARM_VBAT_LOW false
 
 #define STEP_INIT 1
 #define STEP_NORMAL 2
@@ -155,7 +147,7 @@ bool PlayMusic(MusicInfo_s *music_info, float volume)
 static void MusicInit(void);
 static void MusicPlay(void);
 
-void Music_Task(void const *pvParameters)
+void Music_Task(void)
 {
     // 初始化音乐
     MusicInit();
@@ -217,10 +209,11 @@ static void MusicPlay(void)
                 is_play = PLAY_RC_OFFLINE;
                 __kfifo_put(play_list_fifo, (unsigned char *)&is_play, sizeof(is_play));
             }
-            // if (ENABLE_ALARM_MOTOR_OFFLINE && ScanOfflineMotor())
-            // { // 检测是否存在离线电机
-            //     __kfifo_put(play_list_fifo, (unsigned char *)&PLAY_MOTOR_OFFLINE, sizeof(PLAY_MOTOR_OFFLINE));
-            // }
+            if (ENABLE_ALARM_MOTOR_OFFLINE && ScanOfflineMotor())
+            { // 检测是否存在离线电机
+                is_play = PLAY_MOTOR_OFFLINE;
+                __kfifo_put(play_list_fifo, (unsigned char *)&is_play, sizeof(is_play));
+            }
             // if (ENABLE_CHECK_REFEREE_OFFLINE && GetRefereeOffline())
             // { // 检测裁判系统是否离线
             //     __kfifo_put(&play_list_fifo, (unsigned char *)&REFEREE_OFFLINE, sizeof(REFEREE_OFFLINE));

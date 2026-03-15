@@ -25,6 +25,11 @@
 
 #include "Music_Task.h"
 #include "Led_Flow_Task.h"
+#include "Detect_Task.h"
+#include "INS_Task.h"
+#include "Observe_Task.h"
+
+#include "CAN_Task.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -51,15 +56,22 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
+// ins task
 osThreadId Start_INS_TaskHandle;
 uint32_t Start_INS_TaskBuffer[2048];
 osStaticThreadDef_t Start_INS_TaskControlBlock;
+// observe task
+osThreadId Start_Observe_TaskHandle;
+uint32_t Start_Observe_TaskBuffer[2048];
+osStaticThreadDef_t Start_Observe_TaskControlBlock;
+// control task
 osThreadId Start_Control_TaskHandle;
 uint32_t Start_Control_TaskBuffer[2048];
 osStaticThreadDef_t Start_Control_TaskControlBlock;
 osThreadId Start_CAN_TaskHandle;
 uint32_t Start_CAN_TaskBuffer[2048];
 osStaticThreadDef_t Start_CAN_TaskControlBlock;
+// detect task
 osThreadId Start_Detect_TaskHandle;
 uint32_t Start_Detect_TaskBuffer[2048];
 osStaticThreadDef_t Start_Detect_TaskControlBlock;
@@ -68,20 +80,22 @@ osThreadId Start_Music_TaskHandle;
 uint32_t Start_Music_TaskBuffer[256];
 osStaticThreadDef_t Start_Music_TaskControlBlock;
 // LED RGB flow task
-osThreadId Led_RGB_Flow_TaskHandle;
-uint32_t Led_RGB_Flow_TaskBuffer[256];
-osStaticThreadDef_t Led_RGB_Flow_TaskControlBlock;
+osThreadId Start_Led_RGB_Flow_TaskHandle;
+uint32_t Start_Led_RGB_Flow_TaskBuffer[256];
+osStaticThreadDef_t Start_Led_RGB_Flow_TaskControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void INS_Task(void const *argument);
+void INS_TASK(void const *argument);
 void Control_Task(void const *argument);
-void CAN_Task(void const *argument);
-void Detect_Task(void const *argument);
-void Music_Task(void const *argument);
+void CAN_TASK(void const *argument);
+void Detect_TASK(void const *argument);
+void Music_TASK(void const *argument);
+void Observe_TASK(void const *argument);
+void Led_RGB_Flow_TASK(void const *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -131,28 +145,32 @@ void MX_FREERTOS_Init(void)
 
 	/* Create the thread(s) */
 	/* definition and creation of Start_Detect_Task */
-	osThreadStaticDef(Start_Detect_Task, Detect_Task, osPriorityBelowNormal, 0, 2048, Start_Detect_TaskBuffer, &Start_Detect_TaskControlBlock);
+	osThreadStaticDef(Start_Detect_Task, Detect_TASK, osPriorityBelowNormal, 0, 2048, Start_Detect_TaskBuffer, &Start_Detect_TaskControlBlock);
 	Start_Detect_TaskHandle = osThreadCreate(osThread(Start_Detect_Task), NULL);
 
 	/* definition and creation of Start_INS_Task */
-	osThreadStaticDef(Start_INS_Task, INS_Task, osPriorityHigh, 0, 2048, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
+	osThreadStaticDef(Start_INS_Task, INS_TASK, osPriorityRealtime, 0, 2048, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
 	Start_INS_TaskHandle = osThreadCreate(osThread(Start_INS_Task), NULL);
 
+	/* definition and creation of Start_Observe_Task */
+	osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 2048, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
+	Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
+
 	// /* definition and creation of Start_Control_Task */
-	// osThreadStaticDef(Start_Control_Task, Control_Task, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
+	// osThreadStaticDef(Start_Control_Task, Control_TASK, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
 	// Start_Control_TaskHandle = osThreadCreate(osThread(Start_Control_Task), NULL);
 
 	// /* definition and creation of Start_CAN_Task */
-	// osThreadStaticDef(Start_CAN_Task, CAN_Task, osPriorityNormal, 0, 2048, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
-	// Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
+	osThreadStaticDef(Start_CAN_Task, CAN_TASK, osPriorityNormal, 0, 2048, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
+	Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
 
 	/* definition and creation of Start_Music_Task */
-	osThreadStaticDef(Start_Music_Task, Music_Task, osPriorityNormal, 0, 256, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);
+	osThreadStaticDef(Start_Music_Task, Music_TASK, osPriorityNormal, 0, 256, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);
 	Start_Music_TaskHandle = osThreadCreate(osThread(Start_Music_Task), NULL);
 
-	/* definition and creation of Led_RGB_Flow_Task */
-	osThreadStaticDef(Led_RGB_Flow_Task, led_RGB_flow_task, osPriorityLow, 0, 256, Led_RGB_Flow_TaskBuffer, &Led_RGB_Flow_TaskControlBlock);
-	Led_RGB_Flow_TaskHandle = osThreadCreate(osThread(Led_RGB_Flow_Task), NULL);
+	/* definition and creation of Start_Led_RGB_Flow_Task */
+	osThreadStaticDef(Start_Led_RGB_Flow_Task, Led_RGB_Flow_TASK, osPriorityLow, 0, 256, Start_Led_RGB_Flow_TaskBuffer, &Start_Led_RGB_Flow_TaskControlBlock);
+	Start_Led_RGB_Flow_TaskHandle = osThreadCreate(osThread(Start_Led_RGB_Flow_Task), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -166,7 +184,7 @@ void MX_FREERTOS_Init(void)
  * @retval None
  */
 /* USER CODE END Header_INS_Task */
-__weak void INS_Task(void const *argument)
+void INS_TASK(void const *argument)
 {
 	/* init code for USB_DEVICE */
 	MX_USB_DEVICE_Init();
@@ -174,7 +192,7 @@ __weak void INS_Task(void const *argument)
 	/* Infinite loop */
 	for (;;)
 	{
-		osDelay(1);
+		INS_task();
 	}
 	/* USER CODE END INS_Task */
 }
@@ -186,7 +204,7 @@ __weak void INS_Task(void const *argument)
  * @retval None
  */
 /* USER CODE END Header_Control_Task */
-__weak void Control_Task(void const *argument)
+void Control_TASK(void const *argument)
 {
 	/* USER CODE BEGIN Control_Task */
 	/* Infinite loop */
@@ -204,13 +222,13 @@ __weak void Control_Task(void const *argument)
  * @retval None
  */
 /* USER CODE END Header_CAN_Task */
-__weak void CAN_Task(void const *argument)
+void CAN_TASK(void const *argument)
 {
 	/* USER CODE BEGIN CAN_Task */
 	/* Infinite loop */
 	for (;;)
 	{
-		osDelay(1);
+		CAN_Task();
 	}
 	/* USER CODE END CAN_Task */
 }
@@ -222,13 +240,13 @@ __weak void CAN_Task(void const *argument)
  * @retval None
  */
 /* USER CODE END Header_Detect_Task */
-__weak void Detect_Task(void const *argument)
+void Detect_TASK(void const *argument)
 {
 	/* USER CODE BEGIN Detect_Task */
 	/* Infinite loop */
 	for (;;)
 	{
-		osDelay(1);
+		Detect_Task();
 	}
 	/* USER CODE END Detect_Task */
 }
@@ -239,15 +257,50 @@ __weak void Detect_Task(void const *argument)
  * @param argument: Not used
  * @retval None
  */
-__weak void Music_Task(void const *argument)
+void Music_TASK(void const *argument)
 {
 	/* USER CODE BEGIN Music_Task */
 	/* Infinite loop */
 	for (;;)
 	{
-		osDelay(1);
+		Music_Task();
 	}
 	/* USER CODE END Music_Task */
+}
+
+/* USER CODE BEGIN Header_Led_RGB_Flow_Task */
+/**
+ * @brief Function implementing the Led_RGB_Flow_Task thread.
+ * @param argument: Not used
+ * @retval None
+ */
+void Led_RGB_Flow_TASK(void const *argument)
+{
+	/* USER CODE BEGIN Led_RGB_Flow_Task */
+	/* Infinite loop */
+	for (;;)
+	{
+		led_RGB_flow_task();
+	}
+	/* USER CODE END Led_RGB_Flow_Task */
+}
+
+/* USER CODE BEGIN Header_Observe_TASK */
+/**
+ * @brief Function implementing the Observe_TASK thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_Observe_TASK */
+void Observe_TASK(void const *argument)
+{
+	/* USER CODE BEGIN Observe_TASK */
+	/* Infinite loop */
+	for (;;)
+	{
+		Observe_task();
+	}
+	/* USER CODE END Observe_TASK */
 }
 
 /* Private application code --------------------------------------------------*/

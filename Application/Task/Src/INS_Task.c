@@ -56,7 +56,7 @@ static void BMI088_Temp_Control(float temp);
  * @retval None
  */
 /* USER CODE END Header_INS_Task */
-void INS_Task(void const *argument)
+void INS_task(void)
 {
 	/* USER CODE BEGIN INS_Task */
 
@@ -71,20 +71,20 @@ void INS_Task(void const *argument)
 		mahony.dt = ins_dt;
 
 		/* Update the BMI088 measurement */
-		BMI088_Info_Update(&BMI088_Info);
+		BMI088_Read(&BMI088);
 
-		INS.Accel[AXIS_X] = BMI088_Info.Accel[AXIS_X];
-		INS.Accel[AXIS_Y] = BMI088_Info.Accel[AXIS_Y];
-		INS.Accel[AXIS_Z] = BMI088_Info.Accel[AXIS_Z];
-		Accel.x = BMI088_Info.Accel[AXIS_X];
-		Accel.y = BMI088_Info.Accel[AXIS_Y];
-		Accel.z = BMI088_Info.Accel[AXIS_Z];
-		INS.Gyro[AXIS_X] = BMI088_Info.Gyro[AXIS_X];
-		INS.Gyro[AXIS_Y] = BMI088_Info.Gyro[AXIS_Y];
-		INS.Gyro[AXIS_Z] = BMI088_Info.Gyro[AXIS_Z];
-		Gyro.x = BMI088_Info.Gyro[AXIS_X];
-		Gyro.y = BMI088_Info.Gyro[AXIS_Y];
-		Gyro.z = BMI088_Info.Gyro[AXIS_Z];
+		INS.Accel[AXIS_X] = BMI088.Accel[AXIS_X];
+		INS.Accel[AXIS_Y] = BMI088.Accel[AXIS_Y];
+		INS.Accel[AXIS_Z] = BMI088.Accel[AXIS_Z];
+		Accel.x = BMI088.Accel[AXIS_X];
+		Accel.y = BMI088.Accel[AXIS_Y];
+		Accel.z = BMI088.Accel[AXIS_Z];
+		INS.Gyro[AXIS_X] = BMI088.Gyro[AXIS_X];
+		INS.Gyro[AXIS_Y] = BMI088.Gyro[AXIS_Y];
+		INS.Gyro[AXIS_Z] = BMI088.Gyro[AXIS_Z];
+		Gyro.x = BMI088.Gyro[AXIS_X];
+		Gyro.y = BMI088.Gyro[AXIS_Y];
+		Gyro.z = BMI088.Gyro[AXIS_Z];
 
 		mahony_input(&mahony, Gyro, Accel);
 		mahony_update(&mahony);
@@ -159,7 +159,7 @@ void INS_Task(void const *argument)
 
 		if (INS_DWT_Count % 5 == 0)
 		{
-			BMI088_Temp_Control(BMI088_Info.Temperature);
+			BMI088_Temp_Control(BMI088.Temperature);
 		}
 
 		osDelay(1);

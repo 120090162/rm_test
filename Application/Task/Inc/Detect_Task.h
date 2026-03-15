@@ -30,4 +30,6 @@ extern bool vbus_low_warning;
 
 extern uint16_t adc_val[2];
 
+extern void Detect_Task(void);
+
 #endif // DETECT_TASK_H

@@ -144,4 +144,14 @@
  */
 #define REMOTE_FRAME_USART_CAN 0U
 
+/* Music reslove constants ---------------------------------------------------*/
+// 启用遥控器离线报警
+#define ENABLE_ALARM_RC_OFFLINE false
+// 启用电机离线报警
+#define ENABLE_ALARM_MOTOR_OFFLINE true
+// 启用裁判系统离线检测
+#define ENABLE_CHECK_REFEREE_OFFLINE false
+// 启用电池电压过低报警
+#define ENABLE_ALARM_VBAT_LOW false
+
 #endif // ROBOT_CONFIG_H

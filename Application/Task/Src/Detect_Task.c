@@ -36,7 +36,7 @@ bool vbus_low_warning;
  * @retval None
  */
 /* USER CODE END Header_Detect_Task */
-void Detect_Task(void const *argument)
+void Detect_Task(void)
 {
     /* USER CODE BEGIN Detect_Task */
     //  TickType_t systick = 0;
@@ -59,6 +59,7 @@ void Detect_Task(void const *argument)
         }
 
         Remote_Message_Moniter(&remote_ctrl); // 监测遥控器在线状态
+
         osDelay(100);
     }
     /* USER CODE END Detect_Task */

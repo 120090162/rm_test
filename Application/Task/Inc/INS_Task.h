@@ -21,7 +21,7 @@
 #include "stdint.h"
 #include "cmsis_os.h"
 
-#include "Bmi088.h"
+#include "BMI088driver.h"
 #include "QuaternionEKF.h"
 #include "PID.h"
 #include "Config.h"
@@ -44,7 +44,7 @@ typedef struct
 {
 	float q[4]; // 四元数解算值
 
-	float Gyro[3];			// 陀螺仪角速度
+	float Gyro[3];			// 陀螺仪角速度 (rad/s)
 	float Accel[3];			// 加速度计数据
 	float MotionAccel_b[3]; // 机体系下的运动加速度 (Body Frame)
 	float MotionAccel_n[3]; // 导航系下的运动加速度 (Navigation/Earth Frame)
@@ -89,7 +89,6 @@ typedef struct
 } IMU_Param_t;
 
 /* Externs---------------------------------------------------------*/
-extern void INS_Init(void);
 extern void INS_task(void);
 
 // 坐标系转换：机体系(Body Frame) 转 世界/导航系(Earth Frame)

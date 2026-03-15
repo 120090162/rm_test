@@ -12,9 +12,12 @@
 ## 瓴控MF9025
 [电机参数手册](https://www.scribd.com/document/826568712/%E7%93%B4%E6%8E%A7MF9025)
 
-[上位机软件链接](https://wiki.fablab.sorbonne-universite.fr/BookStack/attachments/1258)
-
 [上位机软件使用](https://manuals.plus/m/dd70161e09760607cf1a2254c1d36b70587298ffc2b503120c29e109e3686d45_optim.pdf)
+
+**上位机软件链接与电机手册可以参见 `tools` 文件夹**
+
+## 大疆GM6025
+[电机参数手册](https://www.robomaster.com/zh-CN/products/components/general/GM6020)
 
 ## DM-MC-Board02 电机开发板
 [板子资料](https://gitee.com/kit-miao/dm-mc02)
@@ -46,3 +49,10 @@
 [LQR推导](https://blog.csdn.net/weixin_51772802/article/details/128767706)
 
 [整体工程性思考](https://www.robook.org/blog/dkgzzj)
+
+## note
+x -> roll
+y -> pitch
+z -> yaw
+
+![imu方向定义和can_id设置]()
