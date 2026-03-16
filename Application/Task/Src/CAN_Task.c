@@ -21,6 +21,10 @@
 #include "Remote_Control.h"
 #include "Control_Task.h"
 
+extern INS_t INS;
+
+// debug variables
+
 /* USER CODE BEGIN Header_CAN_Task */
 /**
  * @brief Function implementing the StartCANTask thread.
@@ -31,30 +35,53 @@
 
 void CAN_Task(void)
 {
-
 	TickType_t CAN_Task_SysTick = 0;
-	DM_Motor_Command(&FDCAN2_TxFrame, &DM_8009_Motor[0], DM_Motor_Enable);
-	osDelay(30);
-	DM_Motor_Command(&FDCAN2_TxFrame, &DM_8009_Motor[1], DM_Motor_Enable);
-	osDelay(30);
-	DM_Motor_Command(&FDCAN2_TxFrame, &DM_8009_Motor[2], DM_Motor_Enable);
-	osDelay(30);
-	DM_Motor_Command(&FDCAN2_TxFrame, &DM_8009_Motor[3], DM_Motor_Enable);
-	osDelay(30);
-	LK_Motor_Command(&FDCAN2_TxFrame, &LK_9025_Motor[0], LK_Motor_Enable);
-	osDelay(30);
-	LK_Motor_Command(&FDCAN2_TxFrame, &LK_9025_Motor[1], LK_Motor_Enable);
-	osDelay(30);
+	while (INS.ins_flag == 0)
+	{
+		osDelay(1);
+	}
+	
+
+	for(int j = 0; j < 10; j++)
+	{
+		DM_Motor_Command(&FDCAN3_TxFrame, &DM_8009_Motor[0], DM_Motor_Enable);
+		osDelay(1);
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		DM_Motor_Command(&FDCAN3_TxFrame, &DM_8009_Motor[1], DM_Motor_Enable);
+		osDelay(1);
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		DM_Motor_Command(&FDCAN3_TxFrame, &DM_8009_Motor[2], DM_Motor_Enable);
+		osDelay(1);
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		DM_Motor_Command(&FDCAN3_TxFrame, &DM_8009_Motor[3], DM_Motor_Enable);
+		osDelay(1);
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		LK_Motor_Command(&FDCAN3_TxFrame, &LK_9025_Motor[0], LK_Motor_Enable);
+		osDelay(1);
+	}
+	for(int j = 0; j < 10; j++)
+	{
+		LK_Motor_Command(&FDCAN3_TxFrame, &LK_9025_Motor[1], LK_Motor_Enable);
+		osDelay(1);
+	}
 	for (;;)
 	{
 		// CAN-FD
-		DM_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &DM_8009_Motor[0], 0, 0, 0, 0, 0);
-		DM_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &DM_8009_Motor[1], 0, 0, 0, 0, 0);
-		DM_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &DM_8009_Motor[2], 0, 0, 0, 0, 0);
-		DM_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &DM_8009_Motor[3], 0, 0, 0, 0, 0);
+		DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &DM_8009_Motor[0], 0, 0, 0, 0, 0);
+		DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &DM_8009_Motor[1], 0, 0, 0, 0, 0);
+		DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &DM_8009_Motor[2], 0, 0, 0, 0, 0);
+		DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &DM_8009_Motor[3], 0, 0, 0, 0, 0);
 
-		LK_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &LK_9025_Motor[0], 0, 1);
-		LK_Motor_CAN_TxMessage(&FDCAN2_TxFrame, &LK_9025_Motor[1], 0, 1);
+		LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &LK_9025_Motor[0], 0, 1);
+		LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, &LK_9025_Motor[1], 0, 1);
 
 		osDelay(1);
 	}

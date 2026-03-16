@@ -24,7 +24,7 @@ LK_Motor_Info_Typedef LK_9025_Motor[2] = {
 		.Control_Mode = LK_TORQUE,
 		.FDCANFrame = {
 			.TxIdentifier = 0x04,
-			.RxIdentifier = 0x04,
+			.RxIdentifier = 0x144, // 0x140 + can_id
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -33,7 +33,7 @@ LK_Motor_Info_Typedef LK_9025_Motor[2] = {
 		.Control_Mode = LK_TORQUE,
 		.FDCANFrame = {
 			.TxIdentifier = 0x05,
-			.RxIdentifier = 0x05,
+			.RxIdentifier = 0x145,
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -57,8 +57,8 @@ DM_Motor_Info_Typedef DM_8009_Motor[4] = {
 			.T_MIN = DM_T_MIN,
 		},
 		.FDCANFrame = {
-			.TxIdentifier = 0x01,
-			.RxIdentifier = 0x01,
+			.TxIdentifier = 0x01, // can id
+			.RxIdentifier = 0x11, // master id
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -76,7 +76,7 @@ DM_Motor_Info_Typedef DM_8009_Motor[4] = {
 		},
 		.FDCANFrame = {
 			.TxIdentifier = 0x02,
-			.RxIdentifier = 0x02,
+			.RxIdentifier = 0x12,
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -94,7 +94,7 @@ DM_Motor_Info_Typedef DM_8009_Motor[4] = {
 		},
 		.FDCANFrame = {
 			.TxIdentifier = 0x03,
-			.RxIdentifier = 0x03,
+			.RxIdentifier = 0x13,
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -112,7 +112,7 @@ DM_Motor_Info_Typedef DM_8009_Motor[4] = {
 		},
 		.FDCANFrame = {
 			.TxIdentifier = 0x06,
-			.RxIdentifier = 0x06,
+			.RxIdentifier = 0x16,
 		},
 		.last_fdb_time = 0,
 		.offline = true,
@@ -333,7 +333,7 @@ float DJI_Motor_Encoder_To_Angle(DJI_Motor_Data_Typedef *Data, float torque_rati
 void DM_Motor_Command(FDCAN_TxFrame_TypeDef *FDCAN_TxFrame, DM_Motor_Info_Typedef *DM_Motor, uint8_t CMD)
 {
 
-	FDCAN_TxFrame->Header.Identifier = DM_Motor->FDCANFrame.RxIdentifier;
+	FDCAN_TxFrame->Header.Identifier = DM_Motor->FDCANFrame.TxIdentifier + DM_MODE_MIT;
 
 	FDCAN_TxFrame->Data[0] = 0xFF;
 	FDCAN_TxFrame->Data[1] = 0xFF;
@@ -386,7 +386,7 @@ void DM_Motor_CAN_TxMessage(FDCAN_TxFrame_TypeDef *FDCAN_TxFrame, DM_Motor_Info_
 		KP_Tmp = float_to_uint(KP, DM_KP_MIN, DM_KP_MAX, 12);
 		KD_Tmp = float_to_uint(KD, DM_KD_MIN, DM_KD_MAX, 12);
 
-		FDCAN_TxFrame->Header.Identifier = DM_Motor->FDCANFrame.TxIdentifier;
+		FDCAN_TxFrame->Header.Identifier = DM_Motor->FDCANFrame.TxIdentifier + DM_MODE_MIT;
 		// FDCAN_TxFrame->Header.DataLength = 8; // DLC = 8
 
 		FDCAN_TxFrame->Data[0] = (uint8_t)(Postion_Tmp >> 8);
@@ -489,7 +489,7 @@ void DM_Motor_Info_Update(uint32_t *Identifier, uint8_t *Rx_Buf, DM_Motor_Info_T
 void LK_Motor_Command(FDCAN_TxFrame_TypeDef *FDCAN_TxFrame, LK_Motor_Info_Typedef *LK_Motor, uint8_t CMD)
 {
 
-	FDCAN_TxFrame->Header.Identifier = LK_Motor->FDCANFrame.RxIdentifier + LK_STDID_OFFESET;
+	FDCAN_TxFrame->Header.Identifier = LK_Motor->FDCANFrame.TxIdentifier + LK_STDID_OFFESET;
 
 	FDCAN_TxFrame->Data[1] = 0x00;
 	FDCAN_TxFrame->Data[2] = 0x00;

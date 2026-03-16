@@ -56,3 +56,10 @@ y -> pitch
 z -> yaw
 
 ![imu方向定义和can_id设置]()
+
+[大疆中心板](https://rm-static.djicdn.com/tem/17348/RoboMaster%20%20%E7%94%B5%E8%B0%83%E4%B8%AD%E5%BF%83%E6%9D%BF2%20%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf)
+
+达妙电机的can id和master id需要上位机设置，翎控的can id可以上位机设置也可以拨杆，但master id是直接can_id+0x140了
+
+## trouble
+似乎一条can线上接四个达妙电机加两个翎控电机有点不稳定，可能需要调整成两路can控制

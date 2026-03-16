@@ -170,6 +170,13 @@ static void FDCAN1_RxFifo0RxHandler(uint32_t *Identifier, uint8_t Data[8])
  */
 static void FDCAN3_RxFifo0RxHandler(uint32_t *Identifier, uint8_t Data[8])
 {
+	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[0]);
+	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[1]);
+	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[2]);
+	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[3]);
+
+	LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[0]);
+	LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[1]);
 }
 
 /**
@@ -181,13 +188,13 @@ static void FDCAN3_RxFifo0RxHandler(uint32_t *Identifier, uint8_t Data[8])
 static void FDCAN2_RxFifo1RxHandler(uint32_t *Identifier, uint8_t Data[8])
 {
 
-	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[0]);
-	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[1]);
-	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[2]);
-	DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[3]);
+	// DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[0]);
+	// DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[1]);
+	// DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[2]);
+	// DM_Motor_Info_Update(Identifier, Data, &DM_8009_Motor[3]);
 
-	LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[0]);
-	LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[1]);
+	// LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[0]);
+	// LK_Motor_Info_Update(Identifier, Data, &LK_9025_Motor[1]);
 }
 
 /**

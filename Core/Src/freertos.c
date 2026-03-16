@@ -58,7 +58,7 @@
 /* USER CODE END Variables */
 // ins task
 osThreadId Start_INS_TaskHandle;
-uint32_t Start_INS_TaskBuffer[2048];
+uint32_t Start_INS_TaskBuffer[512];
 osStaticThreadDef_t Start_INS_TaskControlBlock;
 // observe task
 osThreadId Start_Observe_TaskHandle;
@@ -69,19 +69,19 @@ osThreadId Start_Control_TaskHandle;
 uint32_t Start_Control_TaskBuffer[2048];
 osStaticThreadDef_t Start_Control_TaskControlBlock;
 osThreadId Start_CAN_TaskHandle;
-uint32_t Start_CAN_TaskBuffer[2048];
+uint32_t Start_CAN_TaskBuffer[512];
 osStaticThreadDef_t Start_CAN_TaskControlBlock;
 // detect task
 osThreadId Start_Detect_TaskHandle;
-uint32_t Start_Detect_TaskBuffer[2048];
+uint32_t Start_Detect_TaskBuffer[128];
 osStaticThreadDef_t Start_Detect_TaskControlBlock;
 // music task
 osThreadId Start_Music_TaskHandle;
-uint32_t Start_Music_TaskBuffer[256];
+uint32_t Start_Music_TaskBuffer[128];
 osStaticThreadDef_t Start_Music_TaskControlBlock;
 // LED RGB flow task
 osThreadId Start_Led_RGB_Flow_TaskHandle;
-uint32_t Start_Led_RGB_Flow_TaskBuffer[256];
+uint32_t Start_Led_RGB_Flow_TaskBuffer[128];
 osStaticThreadDef_t Start_Led_RGB_Flow_TaskControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -145,31 +145,31 @@ void MX_FREERTOS_Init(void)
 
 	/* Create the thread(s) */
 	/* definition and creation of Start_Detect_Task */
-	osThreadStaticDef(Start_Detect_Task, Detect_TASK, osPriorityBelowNormal, 0, 2048, Start_Detect_TaskBuffer, &Start_Detect_TaskControlBlock);
+	osThreadStaticDef(Start_Detect_Task, Detect_TASK, osPriorityLow, 0, 128, Start_Detect_TaskBuffer, &Start_Detect_TaskControlBlock);
 	Start_Detect_TaskHandle = osThreadCreate(osThread(Start_Detect_Task), NULL);
 
 	/* definition and creation of Start_INS_Task */
-	osThreadStaticDef(Start_INS_Task, INS_TASK, osPriorityRealtime, 0, 2048, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
+	osThreadStaticDef(Start_INS_Task, INS_TASK, osPriorityRealtime, 0, 512, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
 	Start_INS_TaskHandle = osThreadCreate(osThread(Start_INS_Task), NULL);
 
 	/* definition and creation of Start_Observe_Task */
-	osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 2048, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
-	Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
+	// osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 2048, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
+	// Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
 
 	// /* definition and creation of Start_Control_Task */
 	// osThreadStaticDef(Start_Control_Task, Control_TASK, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
 	// Start_Control_TaskHandle = osThreadCreate(osThread(Start_Control_Task), NULL);
 
 	// /* definition and creation of Start_CAN_Task */
-	osThreadStaticDef(Start_CAN_Task, CAN_TASK, osPriorityNormal, 0, 2048, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
+	osThreadStaticDef(Start_CAN_Task, CAN_TASK, osPriorityAboveNormal, 0, 512, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
 	Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
 
 	/* definition and creation of Start_Music_Task */
-	osThreadStaticDef(Start_Music_Task, Music_TASK, osPriorityNormal, 0, 256, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);
+	osThreadStaticDef(Start_Music_Task, Music_TASK, osPriorityBelowNormal, 0, 128, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);
 	Start_Music_TaskHandle = osThreadCreate(osThread(Start_Music_Task), NULL);
 
 	/* definition and creation of Start_Led_RGB_Flow_Task */
-	osThreadStaticDef(Start_Led_RGB_Flow_Task, Led_RGB_Flow_TASK, osPriorityLow, 0, 256, Start_Led_RGB_Flow_TaskBuffer, &Start_Led_RGB_Flow_TaskControlBlock);
+	osThreadStaticDef(Start_Led_RGB_Flow_Task, Led_RGB_Flow_TASK, osPriorityLow, 0, 128, Start_Led_RGB_Flow_TaskBuffer, &Start_Led_RGB_Flow_TaskControlBlock);
 	Start_Led_RGB_Flow_TaskHandle = osThreadCreate(osThread(Start_Led_RGB_Flow_Task), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */

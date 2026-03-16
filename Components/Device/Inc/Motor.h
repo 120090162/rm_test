@@ -92,8 +92,6 @@ typedef struct
  */
 typedef struct
 {
-
-	bool Initlized;			 /*!< init flag */
 	uint8_t State;			 /*!< Motor Message */
 	uint16_t P_int;			 /*!< Motor Positon  uint16 */
 	uint16_t V_int;			 /*!< Motor Velocity uint16 */
