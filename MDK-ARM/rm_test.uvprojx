@@ -425,6 +425,16 @@
               <FileType>1</FileType>
               <FilePath>..\Application\Task\Src\Remote_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>ChassisL_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\ChassisL_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ChassisR_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\ChassisR_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

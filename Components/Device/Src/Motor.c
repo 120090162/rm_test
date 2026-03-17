@@ -540,9 +540,9 @@ void LK_Motor_Info_Update(uint32_t *Identifier, uint8_t *Rx_Buf, LK_Motor_Info_T
 	LK_Motor->Data.speed = ((uint16_t)(Rx_Buf[5]) << 4) | (uint16_t)(Rx_Buf[4]);
 	LK_Motor->Data.encoder = ((uint16_t)(Rx_Buf[7] & 0xF) << 8) | (uint16_t)(Rx_Buf[6]);
 
-	LK_Motor->Data.Torque = LK_Motor->Data.iq * LK_MF_CONTROL_TO_CURRENT;
+	LK_Motor->Data.Current = LK_Motor->Data.iq * LK_MF_CONTROL_TO_CURRENT;
 	LK_Motor->Data.Position = uint_to_float(LK_Motor->Data.encoder, -M_PI, M_PI, 16);
-	LK_Motor->Data.Velocity = LK_Motor->Data.speed * LK_RAD_TO_DEGREE;
+	LK_Motor->Data.Velocity = LK_Motor->Data.speed * LK_DEGREE_TO_RAD;
 	LK_Motor->Data.Temperature = (float)LK_Motor->Data.temprature;
 
 	// check the motor stable running

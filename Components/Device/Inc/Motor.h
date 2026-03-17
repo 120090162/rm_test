@@ -203,7 +203,7 @@ typedef struct
 {
 	float Position;	   /*!< Motor Positon  */
 	float Velocity;	   /*!< Motor Velocity */
-	float Torque;	   /*!< Motor Torque   */
+	float Current;	   /*!< Motor Current   */
 	float Temperature; /*!< Motor Temperature   */
 
 	int8_t temprature; /*!< Motor temprature   */

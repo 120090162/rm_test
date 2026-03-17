@@ -88,18 +88,6 @@
 #define VG_FROM_CAN       0x002 // can口数据源
 #define VG_FROM_YAW_MOTOR 0x003 // 直接使用yaw电机数据
 
-// 可用电机类型
-typedef enum __MotorType {
-    DJI_M2006 = 0,
-    DJI_M3508,
-    DJI_M6020,
-    CYBERGEAR_MOTOR,
-    DM_8009,
-    DM_4310,
-    DM_4340,
-    MF_9025,
-} MotorType_e;
-// clang-format on
 
 #endif /* ROBOT_TYPEDEF_H */
 /*------------------------------ End of File ------------------------------*/

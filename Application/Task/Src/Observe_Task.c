@@ -37,7 +37,7 @@ const float vaEstimateKF_H[4] = {1.0f, 0.0f,
 								 0.0f, 1.0f}; // 观测矩阵 H (单位矩阵，因为直接观测速度和加速度)
 
 float vel_acc[2];
-uint32_t OBSERVE_TIME = 3; // 观测任务运行周期 3ms
+uint32_t OBSERVE_TIME = 3; // 观测任务运行周期 3ms, 与底盘控制任务的运行周期相同，保证每次控制更新时都能得到最新的速度估计值
 
 void Observe_task(void)
 {
@@ -53,21 +53,21 @@ void Observe_task(void)
 
 	while (1)
 	{
-		wr = -chassis_move.wheel_motor[0].para.vel - INS.Gyro[1] + right.d_alpha;										  // 右轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
+		wr = -chassis_move.wheel_motor[0]->Data.Velocity - INS.Gyro[1] + right.d_alpha;									  // 右轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
 		vrb = wr * 0.0603f + right.L0 * right.d_theta * arm_cos_f32(right.theta) + right.d_L0 * arm_sin_f32(right.theta); // 运动学正解：计算右侧机体在 b系(机体坐标系) 下的线速度
 
-		wl = -chassis_move.wheel_motor[1].para.vel + INS.Gyro[1] + left.d_alpha;									 // 左轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
+		wl = -chassis_move.wheel_motor[1]->Data.Velocity + INS.Gyro[1] + left.d_alpha;								 // 左轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
 		vlb = wl * 0.0603f + left.L0 * left.d_theta * arm_cos_f32(left.theta) + left.d_L0 * arm_sin_f32(left.theta); // 运动学正解：计算左侧机体在 b系(机体坐标系) 下的线速度
 
 		aver_v = (vrb - vlb) / 2.0f; // 取左右两侧速度的平均值，得到底盘中心的前进速度
 		xvEstimateKF_Update(&vaEstimateKF, -INS.MotionAccel_b[0], aver_v);
 
 		// 原地旋转的时候由于左右轮速度反向，算出来的平均速度 v_filter 和位移 x_filter 应当都近似为0
-		chassis_move.v_filter = vel_acc[0];																		 // 获取经过卡尔曼滤波后的底盘最优速度估计值
+		chassis_move.v_filter = vel_acc[0];																		 // 得到卡尔曼滤波后的速度															 // 获取经过卡尔曼滤波后的底盘最优速度估计值
 		chassis_move.x_filter = chassis_move.x_filter + chassis_move.v_filter * ((float)OBSERVE_TIME / 1000.0f); // 对速度进行积分，得到底盘位移
 
-		// 下面是直接通过轮子算速度的方法（如果这不是一台轮腿机器人，而是普通麦轮/全向轮步兵的话）
-		//	chassis_move.v_filter=(chassis_move.wheel_motor[0].para.vel-chassis_move.wheel_motor[1].para.vel)*(-0.0603f)/2.0f; // 0.0603是轮子半径，电机读取到的是角速度，乘半径得到线速度。在运动学模型中规定了转向的正负号，所以这里要乘负号
+		// 如果想直接用轮子速度，不做融合的话可以这样
+		//	chassis_move.v_filter=(chassis_move.wheel_motor[0]->Data.Velocity-chassis_move.wheel_motor[1]->Data.Velocity)*(-0.0603f)/2.0f;//0.0603是轮子半径，电机反馈的是角速度，乘半径后得到线速度，数学模型中定义的是轮子顺时针为正，所以要乘个负号
 		//	chassis_move.x_filter=chassis_move.x_filter+chassis_move.v_filter*((float)OBSERVE_TIME/1000.0f);
 
 		osDelay(OBSERVE_TIME);

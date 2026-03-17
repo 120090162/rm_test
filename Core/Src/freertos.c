@@ -28,6 +28,8 @@
 #include "Music_Task.h"
 #include "Led_Flow_Task.h"
 #include "Detect_Task.h"
+#include "ChassisR_Task.h"
+#include "ChassisL_Task.h"
 #include "INS_Task.h"
 #include "Observe_Task.h"
 #include "PS2_Task.h"
@@ -62,6 +64,14 @@
 osThreadId Start_INS_TaskHandle;
 uint32_t Start_INS_TaskBuffer[512];
 osStaticThreadDef_t Start_INS_TaskControlBlock;
+// chassis R task
+osThreadId Start_ChassisR_TaskHandle;
+uint32_t Start_ChassisR_TaskBuffer[512];
+osStaticThreadDef_t Start_ChassisR_TaskControlBlock;
+// chassis L task
+osThreadId Start_ChassisL_TaskHandle;
+uint32_t Start_ChassisL_TaskBuffer[512];
+osStaticThreadDef_t Start_ChassisL_TaskControlBlock;
 // observe task
 osThreadId Start_Observe_TaskHandle;
 uint32_t Start_Observe_TaskBuffer[512];
@@ -97,6 +107,8 @@ osStaticThreadDef_t Start_Remote_TaskControlBlock;
 /* USER CODE END FunctionPrototypes */
 
 void INS_TASK(void const *argument);
+void ChassisR_TASK(void const *argument);
+void ChassisL_TASK(void const *argument);
 void Detect_TASK(void const *argument);
 void Music_TASK(void const *argument);
 void Observe_TASK(void const *argument);
@@ -159,6 +171,14 @@ void MX_FREERTOS_Init(void)
 	osThreadStaticDef(Start_INS_Task, INS_TASK, osPriorityRealtime, 0, 512, Start_INS_TaskBuffer, &Start_INS_TaskControlBlock);
 	Start_INS_TaskHandle = osThreadCreate(osThread(Start_INS_Task), NULL);
 
+	/* definition and creation of Start_ChassisR_Task */
+	osThreadStaticDef(Start_ChassisR_Task, ChassisR_TASK, osPriorityAboveNormal, 0, 512, Start_ChassisR_TaskBuffer, &Start_ChassisR_TaskControlBlock);
+	Start_ChassisR_TaskHandle = osThreadCreate(osThread(Start_ChassisR_Task), NULL);
+
+	/* definition and creation of Start_ChassisL_Task */
+	osThreadStaticDef(Start_ChassisL_Task, ChassisL_TASK, osPriorityAboveNormal, 0, 512, Start_ChassisL_TaskBuffer, &Start_ChassisL_TaskControlBlock);
+	Start_ChassisL_TaskHandle = osThreadCreate(osThread(Start_ChassisL_Task), NULL);
+
 	/* definition and creation of Start_Observe_Task */
 	osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 512, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
 	Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
@@ -206,6 +226,42 @@ void INS_TASK(void const *argument)
 		INS_task();
 	}
 	/* USER CODE END INS_Task */
+}
+
+/* USER CODE BEGIN Header_ChassisR_Task */
+/**
+ * @brief  Function implementing the Start_ChassisR_Task thread.
+ * @param  argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_ChassisR_Task */
+void ChassisR_TASK(void const *argument)
+{
+	/* USER CODE BEGIN ChassisR_Task */
+	/* Infinite loop */
+	for (;;)
+	{
+		ChassisR_task();
+	}
+	/* USER CODE END ChassisR_Task */
+}
+
+/* USER CODE BEGIN Header_ChassisL_Task */
+/**
+ * @brief  Function implementing the Start_ChassisL_Task thread.
+ * @param  argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_ChassisL_Task */
+void ChassisL_TASK(void const *argument)
+{
+	/* USER CODE BEGIN ChassisL_Task */
+	/* Infinite loop */
+	for (;;)
+	{
+		ChassisL_task();
+	}
+	/* USER CODE END ChassisL_Task */
 }
 
 /* USER CODE BEGIN Header_Detect_Task */
