@@ -24,65 +24,13 @@
 // 导入具体的机器人参数配置文件
 #include "robot_param_balanced_infantry.h"
 
-// 选择机器人的各种类型
-#define __RC_TYPE RC_ET08A			 // 遥控器类型
-#define __DEVELOP 1					 // 开发模式
-#define __DEBUG 0					 // 调试模式
-#define __TUNING 0					 // 调参模式
-#define __MUSIC_ON 0				 // 开启音乐
-#define __TUNING_MODE TUNING_NONE	 // 调参模式
-#define __HEAT_IMU 1				 // 加热IMU(防止Debug时因断点导致pid失效产生过热，烧坏IMU)
-#define __IMU_CONTROL_TEMPERATURE 35 // (度)IMU目标控制温度
+// 机器人速度限制参数
+#define MAX_SPEED_VECTOR_VX (3.5f)
+#define MAX_SPEED_VECTOR_VY (3.5f)
+#define MAX_SPEED_VECTOR_WZ (6.0f)
 
-#define __BOARD_INSTALL_SPIN_MATRIX \
-	{1.0f, 0.0f, 0.0f},             \
-		{0.0f, 1.0f, 0.0f},         \
-		{0.0f, 0.0f, 1.0f}
-
-// USB通信的部分选项
-#define __USB_SEND_DEBUG 1 // 发送DEBUG数据
-
-#ifndef __VIRTUAL_GIMBAL_FROM
-#define __VIRTUAL_GIMBAL_FROM VG_FROM_NONE // 虚拟云台数据来源（用于云台底盘分离控制）
-#endif
-
-// 本板id
-#ifndef __SELF_BOARD_ID
-#define __SELF_BOARD_ID C_BOARD_DEFAULT
-#endif
-
-// 控制链路选择
-#ifndef __CONTROL_LINK_RC
-#define __CONTROL_LINK_RC CL_RC_DIRECT
-#endif
-
-#ifndef __CONTROL_LINK_KM
-#define __CONTROL_LINK_KM CL_KM_RC
-#endif
-
-#ifndef __CONTROL_LINK_PS2
-#define __CONTROL_LINK_PS2 CL_PS2_NONE
-#endif
-
-// 模块检查
-#ifndef CHASSIS_TYPE
-#define CHASSIS_TYPE CHASSIS_NONE
-#endif
-
-#ifndef GIMBAL_TYPE
-#define GIMBAL_TYPE GIMBAL_NONE
-#endif
-
-#ifndef SHOOT_TYPE
-#define SHOOT_TYPE SHOOT_NONE
-#endif
-
-#ifndef MECHANICAL_ARM_TYPE
-#define MECHANICAL_ARM_TYPE MECHANICAL_ARM_NONE
-#endif
-
-#ifndef CUSTOM_CONTROLLER_TYPE
-#define CUSTOM_CONTROLLER_TYPE CUSTOM_CONTROLLER_NONE
-#endif
+#define MIN_SPEED_VECTOR_VX (-MAX_SPEED_VECTOR_VX)
+#define MIN_SPEED_VECTOR_VY (-MAX_SPEED_VECTOR_VY)
+#define MIN_SPEED_VECTOR_WZ (-MAX_SPEED_VECTOR_WZ)
 
 #endif /* ROBOT_PARAM_H */

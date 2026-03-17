@@ -60,15 +60,17 @@
 /*DT7遥控器相关宏定义*/
 #define DT7_SW_LEFT 1	// DT7遥控器左侧拨杆通道号
 #define DT7_SW_RIGHT 0	// DT7遥控器右侧拨杆通道号
-#define DT7_CH_LH 0		// DT7遥控器右侧水平摇杆通道号
-#define DT7_CH_LV 1		// DT7遥控器右侧竖直摇杆通道号
-#define DT7_CH_RH 2		// DT7遥控器左侧水平摇杆通道号
-#define DT7_CH_RV 3		// DT7遥控器左侧竖直摇杆通道号
+#define DT7_CH_RH 0		// DT7遥控器右侧水平摇杆通道号
+#define DT7_CH_RV 1		// DT7遥控器右侧竖直摇杆通道号
+#define DT7_CH_LH 2		// DT7遥控器左侧水平摇杆通道号
+#define DT7_CH_LV 3		// DT7遥控器左侧竖直摇杆通道号
 #define DT7_CH_ROLLER 4 // DT7遥控器左上角滚轮通道号
 
-#define DT7_SW_UP (uint8_t)1	// DT7遥控器拨杆上位置
-#define DT7_SW_MID (uint8_t)3	// DT7遥控器拨杆中位置
-#define DT7_SW_DOWN (uint8_t)2	// DT7遥控器拨杆下位置
+#define DT7_SW_UP (uint8_t)1   // DT7遥控器拨杆上位置
+#define DT7_SW_MID (uint8_t)3  // DT7遥控器拨杆中位置
+#define DT7_SW_DOWN (uint8_t)2 // DT7遥控器拨杆下位置
+
+#define DT7_RC_TO_ONE 0.0015151515151515f // (1/660)遥控器通道值归一化系数
 
 /* Exported types ------------------------------------------------------------*/
 /**

@@ -1,7 +1,8 @@
 #include "Remote_Task.h"
 #include "Detect_Task.h"
-#include "Remote_Control.h"
 #include "cmsis_os.h"
+
+#include "robot_param.h"
 
 uint32_t REMOTE_TIME = 10; // 遥控器任务运行周期10ms
 
@@ -18,6 +19,10 @@ void Remote_task(void)
 	static float last_jump_vrb = 0;
 	static uint32_t vbat_low_count = 0;
 
+	int16_t rc_x = 0, rc_wz = 0;
+	int16_t rc_length = 0, rc_angle = 0;
+	int16_t rc_roll = 0;
+
 	while (1)
 	{
 		if (!remote_ctrl.rc_lost)
@@ -30,7 +35,7 @@ void Remote_task(void)
 
 				vbat_low_count = 0;
 			}
-			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_MID)
+			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP)
 			{
 				//				if(chassis_move.vbus > VBAT_LOW_VAL)
 				//				{
@@ -70,9 +75,11 @@ void Remote_task(void)
 
 			if (chassis_move.start_flag == 1)
 			{
+				rc_deadband_limit(remote_ctrl.rc.ch[CHASSIS_X_CHANNEL], rc_x, CHASSIS_RC_DEADLINE);
 				// 6s 电池供电时的速度映射 (动力更强，倍率更高)
-				chassis_move.v_set = ((float)remote_ctrl.rc.ch[DT7_CH_RV]) * (-0.00097f * 1.3f); // 摇杆向前推为负
-				chassis_move.x_set = chassis_move.x_set + chassis_move.v_set * dt;
+				chassis_move.v_set = ((float)remote_ctrl.rc.ch[CHASSIS_X_CHANNEL]) * (-0.00097f * 1.3f); // 摇杆向前推为负
+				chassis_move.x_set = rc_x * DT7_RC_TO_ONE * MAX_SPEED_VECTOR_VX;
+				// chassis_move.x_set = chassis_move.x_set + chassis_move.v_set * dt;
 
 				// 左摇杆水平方向控制偏航角 (Yaw转向)
 				chassis_move.turn_set += ((float)remote_ctrl.rc.ch[DT7_CH_LH]) * (-0.0000625f);
@@ -132,8 +139,8 @@ void Remote_task(void)
 
 			else
 			{
-				chassis_move.v_set = 0.0f;						// 速度清零
-				chassis_move.x_set = chassis_move.x_filter;		// 保持位置
+				chassis_move.v_set = 0.0f; // 速度清零
+				// chassis_move.x_set = chassis_move.x_filter;		// 保持位置
 				chassis_move.turn_set = chassis_move.total_yaw; // 保持偏航
 				chassis_move.leg_set = 0.08f;					// 原始腿长
 				chassis_move.roll_set = -0.03f;
@@ -146,8 +153,8 @@ void Remote_task(void)
 			chassis_move.recover_flag = 0;
 			vbat_low_count = 0;
 
-			chassis_move.v_set = 0.0f;						// 速度清零
-			chassis_move.x_set = chassis_move.x_filter;		// 保持位置
+			chassis_move.v_set = 0.0f; // 速度清零
+			// chassis_move.x_set = chassis_move.x_filter;		// 保持位置
 			chassis_move.turn_set = chassis_move.total_yaw; // 保持偏航
 			chassis_move.leg_set = 0.08f;					// 原始腿长
 			chassis_move.roll_set = -0.03f;
