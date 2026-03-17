@@ -66,6 +66,10 @@
 #define DT7_CH_RV 3		// DT7遥控器左侧竖直摇杆通道号
 #define DT7_CH_ROLLER 4 // DT7遥控器左上角滚轮通道号
 
+#define DT7_SW_UP (uint8_t)1	// DT7遥控器拨杆上位置
+#define DT7_SW_MID (uint8_t)3	// DT7遥控器拨杆中位置
+#define DT7_SW_DOWN (uint8_t)2	// DT7遥控器拨杆下位置
+
 /* Exported types ------------------------------------------------------------*/
 /**
  * @brief typedef enum that contains the status of the keyboard.

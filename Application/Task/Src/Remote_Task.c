@@ -22,15 +22,15 @@ void Remote_task(void)
 	{
 		if (!remote_ctrl.rc_lost)
 		{
-			if (remote_ctrl.rc.s[DT7_SW_LEFT] == 2)
+			if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_DOWN)
 			{
-				// Power Off (遥控器SWD拨杆打下，关闭底盘)
+				// Power Off (遥控器左SW拨杆打下，关闭底盘)
 				chassis_move.start_flag = 0;
 				chassis_move.recover_flag = 0;
 
 				vbat_low_count = 0;
 			}
-			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == 3)
+			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_MID)
 			{
 				//				if(chassis_move.vbus > VBAT_LOW_VAL)
 				//				{
