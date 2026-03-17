@@ -72,7 +72,7 @@ void SBUS_TO_RC(volatile const uint8_t *sbus_buf, Remote_Info_Typedef *remote_ct
 	remote_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
 
 	/* reset the online count */
-	remote_ctrl->online_cnt = 0xFAU;
+	remote_ctrl->online_cnt = 0x10U; // 方便后续监测在线状态
 
 	/* reset the lost flag */
 	remote_ctrl->rc_lost = false;
@@ -88,13 +88,13 @@ void SBUS_TO_RC(volatile const uint8_t *sbus_buf, Remote_Info_Typedef *remote_ct
 void Remote_Message_Moniter(Remote_Info_Typedef *remote_ctrl)
 {
 	/* Juege the device status */
-	if (remote_ctrl->online_cnt <= 0x32U)
+	if (remote_ctrl->online_cnt <= 0x5U) // 超过一定时间没有接收到数据，认为离线，清除数据
 	{
 		/* clear the data */
 		memset(remote_ctrl, 0, sizeof(Remote_Info_Typedef));
 
 		/* reset the online count */
-
+		remote_ctrl->online_cnt = 0U;
 		/* set the lost flag */
 		remote_ctrl->rc_lost = true;
 	}

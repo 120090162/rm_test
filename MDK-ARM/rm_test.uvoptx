@@ -168,42 +168,27 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Image_Trans_MultiRx_Buff</ItemText>
+          <ItemText>BMI088_Info</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>VT13_Info,0x0A</ItemText>
+          <ItemText>adc_val[2],0x10</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>huart1,0x0A</ItemText>
+          <ItemText>play_list_fifo</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>remote_ctrl</ItemText>
+          <ItemText>INS</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>BMI088_Info</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>adc_val[2],0x10</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>play_list_fifo</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>INS</ItemText>
+          <ItemText>remote_ctrl</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

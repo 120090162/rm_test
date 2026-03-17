@@ -61,7 +61,7 @@ void Detect_Task(void)
         {
             Remote_Message_Moniter(&remote_ctrl); // 监测遥控器在线状态
         }
-        osDelay(100);
+        osDelay(100); // 100ms检测一次
     }
     /* USER CODE END Detect_Task */
 }
