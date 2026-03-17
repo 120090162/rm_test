@@ -34,7 +34,7 @@ void MCU_Init(void)
 	BSP_GPIO_Init();
 	BSP_FDCAN_Init();
 	BSP_USART_Init();
-	BSP_ADC_Init();
+	BSP_ADC_Init(); // 检测电源电压用
 	MX_USB_DEVICE_Init();
 	/* ----------------------- Device Init ----------------------- */
 	/* BMI088初始化 */

@@ -391,16 +391,6 @@
               <FilePath>..\Application\Task\Src\INS_Task.c</FilePath>
             </File>
             <File>
-              <FileName>Control_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\Task\Src\Control_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>CAN_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\Task\Src\CAN_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>Detect_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\Task\Src\Detect_Task.c</FilePath>
@@ -424,6 +414,11 @@
               <FileName>Chassis_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\Task\Src\Chassis_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>PS2_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\PS2_Task.c</FilePath>
             </File>
           </Files>
         </Group>

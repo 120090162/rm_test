@@ -15,9 +15,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "cmsis_os.h"
 #include "Detect_Task.h"
-// #include "Control_Task.h"
+#include "Config.h"
 #include "Remote_Control.h"
-#include "bsp_gpio.h"
+#include "bsp_adc.h"
 
 float VBAT_WARNNING_VAL;
 float VBAT_LOW_VAL;
@@ -47,7 +47,7 @@ void Detect_Task(void)
     for (;;)
     {
         // 监测电压
-        vbus = (adc_val[0] * 3.3f / 65535) * 11.0f;
+        vbus = USER_ADC_Voltage_Update();
         if (vbus < VBAT_WARNNING_VAL)
         {
 
@@ -57,9 +57,10 @@ void Detect_Task(void)
         {
             vbus_low_warning = false;
         }
-
-        Remote_Message_Moniter(&remote_ctrl); // 监测遥控器在线状态
-
+        if (ENABLE_ALARM_RC_OFFLINE)
+        {
+            Remote_Message_Moniter(&remote_ctrl); // 监测遥控器在线状态
+        }
         osDelay(100);
     }
     /* USER CODE END Detect_Task */

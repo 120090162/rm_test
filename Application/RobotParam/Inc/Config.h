@@ -144,9 +144,11 @@
  */
 #define REMOTE_FRAME_USART_CAN 0U
 
-/* Music reslove constants ---------------------------------------------------*/
-// 启用遥控器离线报警
-#define ENABLE_ALARM_RC_OFFLINE false
+/* reslove constants ---------------------------------------------------*/
+// 启用DT7遥控器
+#define ENABLE_ALARM_RC_OFFLINE true
+// 启用ps2遥控器
+#define ENABLE_ALARM_PS2_OFFLINE false
 // 启用电机离线报警
 #define ENABLE_ALARM_MOTOR_OFFLINE true
 // 启用裁判系统离线检测

@@ -3,3 +3,15 @@
 chassis_t chassis_move;
 vmc_leg_t left;
 vmc_leg_t right;
+
+void mySaturate(float *in, float min, float max)
+{
+    if (*in < min)
+    {
+        *in = min;
+    }
+    else if (*in > max)
+    {
+        *in = max;
+    }
+}

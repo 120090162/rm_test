@@ -69,6 +69,11 @@ extern "C"
 #define GYRO_INT_Pin GPIO_PIN_12
 #define GYRO_INT_GPIO_Port GPIOE
 
+#define DI_Pin GPIO_PIN_0
+#define DI_GPIO_Port GPIOA
+#define DO_Pin GPIO_PIN_2
+#define DO_GPIO_Port GPIOA
+
 	/* USER CODE BEGIN Private defines */
 
 	/* USER CODE END Private defines */

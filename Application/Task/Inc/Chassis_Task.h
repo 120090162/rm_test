@@ -152,4 +152,6 @@ extern chassis_t chassis_move;
 extern vmc_leg_t left;
 extern vmc_leg_t right;
 
+extern void mySaturate(float *in, float min, float max);
+
 #endif

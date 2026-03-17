@@ -73,8 +73,6 @@ void MX_FREERTOS_Init(void);
 uint8_t r = 1;
 uint8_t g = 1;
 uint8_t b = 1;
-
-uint16_t adc_val[2];
 /* USER CODE END 0 */
 
 /**
@@ -145,10 +143,6 @@ int main(void)
 	BSP_DWT_Init(640); // 640MHz的CPU，1us对应640个时钟周期
 
 	SEGGER_SYSVIEW_Conf();
-
-	// 检测电源电压用
-	HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_val, 2);
 
 	/* USER CODE END 2 */
 

@@ -26,6 +26,7 @@
 #include "music_crychic.h"
 #include "music_vbat.h"
 // #include "referee.h"
+#include "PS2_Task.h"
 #include "Remote_Control.h"
 #include "stm32h7xx_hal.h"
 
@@ -204,7 +205,7 @@ static void MusicPlay(void)
         {
             last_abnormal_warning_time = HAL_GetTick();
 
-            if (ENABLE_ALARM_RC_OFFLINE && GetRcOffline())
+            if ((ENABLE_ALARM_RC_OFFLINE && GetRcOffline()) || (ENABLE_ALARM_PS2_OFFLINE && ps2_lost))
             { // 检测遥控器是否离线
                 is_play = PLAY_RC_OFFLINE;
                 __kfifo_put(play_list_fifo, (unsigned char *)&is_play, sizeof(is_play));

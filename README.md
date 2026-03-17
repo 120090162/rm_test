@@ -61,5 +61,43 @@ z -> yaw
 
 达妙电机的can id和master id需要上位机设置，翎控的can id可以上位机设置也可以拨杆，但master id是直接can_id+0x140了
 
+[ps2使用](https://www.bilibili.com/video/BV1pT411a72s/?spm_id_from=333.337.search-card.all.click&vd_source=a61233bf2bcd88af9cb7538da95fa883)
+
+`.old` 文件是一些旧的测试文件，方便学习测试传感器
+
 ## trouble
 似乎一条can线上接四个达妙电机加两个翎控电机有点不稳定，可能需要调整成两路can控制
+
+## 遥控器
+- **PS2手柄**
+
+1. 数字按键 (Button)
+
+START 键 (data->key == 4)
+作用：启停控制开关。第一次按下启动底盘（start_flag = 1），再次按下关闭底盘（start_flag = 0）。
+
+SELECT 键 (data->key == 1)
+作用：跳跃准备（预跳跃）。在底盘启动状态下，按一下进入预跳跃状态（prejump_flag = 1），再按一下取消预跳跃。
+
+十字键 - 上 (data->key == 5)
+作用：执行跳跃。当处于预跳跃状态（prejump_flag == 1）且当前未在跳跃时，按下此键会触发底层跳跃动作（jump_flag = 1）。
+
+L2 键 (data->key == 9) (根据 MASK 数组第9位推断)
+作用：一键复位横滚角（Roll角）。无论处于什么姿态，按下会将期望横滚角设为默认值（-0.03f）。
+
+2. 模拟摇杆 (Joystick)
+（前提：必须在 START 键开启的状态下才有效）
+
+右摇杆 Y 轴 (data->ry)
+作用：控制底盘的前后移动速度（v_set）及位移。向上推为前进（负值），向下推为后退。
+
+右摇杆 X 轴 (data->rx)
+作用：控制底盘的偏航/转向（turn_set）。向左右打杆用于调节机器人的航向角位置。
+
+左摇杆 X 轴 (data->lx)
+作用：控制底盘的横滚倾斜角 / Roll 姿态（roll_set）。并做了幅度限幅（-0.40 ~ 0.40）。
+
+左摇杆 Y 轴 (data->ly)
+作用：控制底盘的目标腿长 / 高度（leg_set）。并在推动时屏蔽离地检测，防止机器人因为瞬间收腿而产生误判。也是带有限幅的（0.072 ~ 0.21）。
+
+- **DT7手柄**

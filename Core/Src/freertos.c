@@ -23,13 +23,14 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+#include "Config.h"
+
 #include "Music_Task.h"
 #include "Led_Flow_Task.h"
 #include "Detect_Task.h"
 #include "INS_Task.h"
 #include "Observe_Task.h"
-
-#include "CAN_Task.h"
+#include "PS2_Task.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -62,15 +63,8 @@ uint32_t Start_INS_TaskBuffer[512];
 osStaticThreadDef_t Start_INS_TaskControlBlock;
 // observe task
 osThreadId Start_Observe_TaskHandle;
-uint32_t Start_Observe_TaskBuffer[2048];
+uint32_t Start_Observe_TaskBuffer[512];
 osStaticThreadDef_t Start_Observe_TaskControlBlock;
-// control task
-osThreadId Start_Control_TaskHandle;
-uint32_t Start_Control_TaskBuffer[2048];
-osStaticThreadDef_t Start_Control_TaskControlBlock;
-osThreadId Start_CAN_TaskHandle;
-uint32_t Start_CAN_TaskBuffer[512];
-osStaticThreadDef_t Start_CAN_TaskControlBlock;
 // detect task
 osThreadId Start_Detect_TaskHandle;
 uint32_t Start_Detect_TaskBuffer[128];
@@ -84,18 +78,23 @@ osThreadId Start_Led_RGB_Flow_TaskHandle;
 uint32_t Start_Led_RGB_Flow_TaskBuffer[128];
 osStaticThreadDef_t Start_Led_RGB_Flow_TaskControlBlock;
 
+#if (ENABLE_ALARM_PS2_OFFLINE)
+osThreadId Start_PS2_TaskHandle;
+uint32_t Start_PS2_TaskBuffer[128];
+osStaticThreadDef_t Start_PS2_TaskControlBlock;
+#endif
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
 void INS_TASK(void const *argument);
-void Control_Task(void const *argument);
-void CAN_TASK(void const *argument);
 void Detect_TASK(void const *argument);
 void Music_TASK(void const *argument);
 void Observe_TASK(void const *argument);
 void Led_RGB_Flow_TASK(void const *argument);
+void PS2_TASK(void const *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -153,16 +152,8 @@ void MX_FREERTOS_Init(void)
 	Start_INS_TaskHandle = osThreadCreate(osThread(Start_INS_Task), NULL);
 
 	/* definition and creation of Start_Observe_Task */
-	// osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 2048, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
-	// Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
-
-	// /* definition and creation of Start_Control_Task */
-	// osThreadStaticDef(Start_Control_Task, Control_TASK, osPriorityAboveNormal, 0, 2048, Start_Control_TaskBuffer, &Start_Control_TaskControlBlock);
-	// Start_Control_TaskHandle = osThreadCreate(osThread(Start_Control_Task), NULL);
-
-	// /* definition and creation of Start_CAN_Task */
-	osThreadStaticDef(Start_CAN_Task, CAN_TASK, osPriorityAboveNormal, 0, 512, Start_CAN_TaskBuffer, &Start_CAN_TaskControlBlock);
-	Start_CAN_TaskHandle = osThreadCreate(osThread(Start_CAN_Task), NULL);
+	osThreadStaticDef(Start_Observe_Task, Observe_TASK, osPriorityHigh, 0, 512, Start_Observe_TaskBuffer, &Start_Observe_TaskControlBlock);
+	Start_Observe_TaskHandle = osThreadCreate(osThread(Start_Observe_Task), NULL);
 
 	/* definition and creation of Start_Music_Task */
 	osThreadStaticDef(Start_Music_Task, Music_TASK, osPriorityBelowNormal, 0, 128, Start_Music_TaskBuffer, &Start_Music_TaskControlBlock);
@@ -171,6 +162,12 @@ void MX_FREERTOS_Init(void)
 	/* definition and creation of Start_Led_RGB_Flow_Task */
 	osThreadStaticDef(Start_Led_RGB_Flow_Task, Led_RGB_Flow_TASK, osPriorityLow, 0, 128, Start_Led_RGB_Flow_TaskBuffer, &Start_Led_RGB_Flow_TaskControlBlock);
 	Start_Led_RGB_Flow_TaskHandle = osThreadCreate(osThread(Start_Led_RGB_Flow_Task), NULL);
+
+#if (ENABLE_ALARM_PS2_OFFLINE)
+	/* definition and creation of Start_PS2_Task */
+	osThreadStaticDef(Start_PS2_Task, PS2_TASK, osPriorityAboveNormal, 0, 128, Start_PS2_TaskBuffer, &Start_PS2_TaskControlBlock);
+	Start_PS2_TaskHandle = osThreadCreate(osThread(Start_PS2_Task), NULL);
+#endif
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -195,42 +192,6 @@ void INS_TASK(void const *argument)
 		INS_task();
 	}
 	/* USER CODE END INS_Task */
-}
-
-/* USER CODE BEGIN Header_Control_Task */
-/**
- * @brief Function implementing the StartControl thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_Control_Task */
-void Control_TASK(void const *argument)
-{
-	/* USER CODE BEGIN Control_Task */
-	/* Infinite loop */
-	for (;;)
-	{
-		osDelay(1);
-	}
-	/* USER CODE END Control_Task */
-}
-
-/* USER CODE BEGIN Header_CAN_Task */
-/**
- * @brief Function implementing the StartCAN thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_CAN_Task */
-void CAN_TASK(void const *argument)
-{
-	/* USER CODE BEGIN CAN_Task */
-	/* Infinite loop */
-	for (;;)
-	{
-		CAN_Task();
-	}
-	/* USER CODE END CAN_Task */
 }
 
 /* USER CODE BEGIN Header_Detect_Task */
@@ -301,6 +262,24 @@ void Observe_TASK(void const *argument)
 		Observe_task();
 	}
 	/* USER CODE END Observe_TASK */
+}
+
+/* USER CODE BEGIN Header_PS2_Task */
+/**
+ * @brief Function implementing the PS2_TASK thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_PS2_Task */
+void PS2_TASK(void const *argument)
+{
+	/* USER CODE BEGIN PS2_Task */
+	/* Infinite loop */
+	for (;;)
+	{
+		pstwo_task();
+	}
+	/* USER CODE END PS2_Task */
 }
 
 /* Private application code --------------------------------------------------*/
