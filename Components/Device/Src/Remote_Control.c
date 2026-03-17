@@ -2,6 +2,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "Remote_Control.h"
+#include "Config.h"
 #include "ramp.h"
 
 /* Exported variables ---------------------------------------------------------*/
@@ -9,7 +10,7 @@
  * @brief remote control structure variable
  */
 Remote_Info_Typedef remote_ctrl = {
-	.online_cnt = 0xFAU,
+	.online_cnt = RC_ONLINE_CNT,
 	.rc_lost = true,
 };
 
@@ -47,7 +48,7 @@ void SBUS_TO_RC(volatile const uint8_t *sbus_buf, Remote_Info_Typedef *remote_ct
 	remote_ctrl->rc.ch[1] = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff;						  //!< Channel 1
 	remote_ctrl->rc.ch[2] = ((sbus_buf[2] >> 6) | (sbus_buf[3] << 2) | (sbus_buf[4] << 10)) & 0x07ff; //!< Channel 2
 	remote_ctrl->rc.ch[3] = ((sbus_buf[4] >> 1) | (sbus_buf[5] << 7)) & 0x07ff;						  //!< Channel 3
-	remote_ctrl->rc.ch[4] = (sbus_buf[16] | (sbus_buf[17] << 8)) & 0x07ff;							  //!< Channel 4
+	remote_ctrl->rc.ch[4] = (sbus_buf[16] | (sbus_buf[17] << 8)) & 0x07ff;							  //!< Channel 4, NULL
 
 	/* Switch left, right */
 	remote_ctrl->rc.s[0] = ((sbus_buf[5] >> 4) & 0x0003);	   //!< Switch left
@@ -72,7 +73,7 @@ void SBUS_TO_RC(volatile const uint8_t *sbus_buf, Remote_Info_Typedef *remote_ct
 	remote_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
 
 	/* reset the online count */
-	remote_ctrl->online_cnt = 0x10U; // 方便后续监测在线状态
+	remote_ctrl->online_cnt = RC_ONLINE_CNT; // 方便后续监测在线状态
 
 	/* reset the lost flag */
 	remote_ctrl->rc_lost = false;
@@ -88,13 +89,11 @@ void SBUS_TO_RC(volatile const uint8_t *sbus_buf, Remote_Info_Typedef *remote_ct
 void Remote_Message_Moniter(Remote_Info_Typedef *remote_ctrl)
 {
 	/* Juege the device status */
-	if (remote_ctrl->online_cnt <= 0x5U) // 超过一定时间没有接收到数据，认为离线，清除数据
+	if (remote_ctrl->online_cnt <= RC_OFFLINE_CNT) // 超过一定时间没有接收到数据，认为离线，清除数据
 	{
 		/* clear the data */
 		memset(remote_ctrl, 0, sizeof(Remote_Info_Typedef));
 
-		/* reset the online count */
-		remote_ctrl->online_cnt = 0U;
 		/* set the lost flag */
 		remote_ctrl->rc_lost = true;
 	}

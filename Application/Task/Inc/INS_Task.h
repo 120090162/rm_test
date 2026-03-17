@@ -90,6 +90,7 @@ typedef struct
 
 /* Externs---------------------------------------------------------*/
 extern void INS_task(void);
+extern INS_t INS;
 
 // 坐标系转换：机体系(Body Frame) 转 世界/导航系(Earth Frame)
 void BodyFrameToEarthFrame(const float *vecBF, float *vecEF, float *q);

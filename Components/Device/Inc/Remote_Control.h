@@ -57,6 +57,15 @@
  */
 #define MOUSE_SPEED_MAX 300U
 
+/*DT7遥控器相关宏定义*/
+#define DT7_SW_LEFT 1	// DT7遥控器左侧拨杆通道号
+#define DT7_SW_RIGHT 0	// DT7遥控器右侧拨杆通道号
+#define DT7_CH_LH 0		// DT7遥控器右侧水平摇杆通道号
+#define DT7_CH_LV 1		// DT7遥控器右侧竖直摇杆通道号
+#define DT7_CH_RH 2		// DT7遥控器左侧水平摇杆通道号
+#define DT7_CH_RV 3		// DT7遥控器左侧竖直摇杆通道号
+#define DT7_CH_ROLLER 4 // DT7遥控器左上角滚轮通道号
+
 /* Exported types ------------------------------------------------------------*/
 /**
  * @brief typedef enum that contains the status of the keyboard.
@@ -113,7 +122,7 @@ typedef struct
 	struct
 	{
 		int16_t ch[5];
-		uint8_t s[2];
+		uint8_t s[2]; // Left, Right
 	} rc;
 
 	/**

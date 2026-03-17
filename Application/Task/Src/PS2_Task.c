@@ -44,8 +44,6 @@ uint16_t MASK[] = {
 bool ps2_lost = true; // ps2手柄离线标志位，初始为离线
 uint16_t ps2_mode;
 
-extern chassis_t chassis_move;
-
 uint32_t PS2_TIME = 10; // ps2手柄任务运行周期10ms
 void pstwo_task(void)
 {

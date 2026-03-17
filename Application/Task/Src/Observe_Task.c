@@ -36,12 +36,6 @@ float vaEstimateKF_K[4]; // 卡尔曼增益 K
 const float vaEstimateKF_H[4] = {1.0f, 0.0f,
 								 0.0f, 1.0f}; // 观测矩阵 H (单位矩阵，因为直接观测速度和加速度)
 
-extern INS_t INS;
-extern chassis_t chassis_move;
-
-extern vmc_leg_t right;
-extern vmc_leg_t left;
-
 float vel_acc[2];
 uint32_t OBSERVE_TIME = 3; // 观测任务运行周期 3ms
 

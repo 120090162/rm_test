@@ -156,4 +156,7 @@
 // 启用电池电压过低报警
 #define ENABLE_ALARM_VBAT_LOW false
 
+#define RC_ONLINE_CNT 10U
+#define RC_OFFLINE_CNT 5U
+
 #endif // ROBOT_CONFIG_H

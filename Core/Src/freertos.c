@@ -31,6 +31,7 @@
 #include "INS_Task.h"
 #include "Observe_Task.h"
 #include "PS2_Task.h"
+#include "Remote_Task.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -84,6 +85,12 @@ uint32_t Start_PS2_TaskBuffer[128];
 osStaticThreadDef_t Start_PS2_TaskControlBlock;
 #endif
 
+#if (ENABLE_ALARM_RC_OFFLINE)
+osThreadId Start_Remote_TaskHandle;
+uint32_t Start_Remote_TaskBuffer[128];
+osStaticThreadDef_t Start_Remote_TaskControlBlock;
+#endif
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
@@ -95,6 +102,7 @@ void Music_TASK(void const *argument);
 void Observe_TASK(void const *argument);
 void Led_RGB_Flow_TASK(void const *argument);
 void PS2_TASK(void const *argument);
+void Remote_TASK(void const *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -167,6 +175,12 @@ void MX_FREERTOS_Init(void)
 	/* definition and creation of Start_PS2_Task */
 	osThreadStaticDef(Start_PS2_Task, PS2_TASK, osPriorityAboveNormal, 0, 128, Start_PS2_TaskBuffer, &Start_PS2_TaskControlBlock);
 	Start_PS2_TaskHandle = osThreadCreate(osThread(Start_PS2_Task), NULL);
+#endif
+
+#if (ENABLE_ALARM_RC_OFFLINE)
+	/* definition and creation of Start_Remote_Task */
+	osThreadStaticDef(Start_Remote_Task, Remote_TASK, osPriorityAboveNormal, 0, 128, Start_Remote_TaskBuffer, &Start_Remote_TaskControlBlock);
+	Start_Remote_TaskHandle = osThreadCreate(osThread(Start_Remote_Task), NULL);
 #endif
 
 	/* USER CODE BEGIN RTOS_THREADS */
@@ -280,6 +294,24 @@ void PS2_TASK(void const *argument)
 		pstwo_task();
 	}
 	/* USER CODE END PS2_Task */
+}
+
+/* USER CODE BEGIN Header_Remote_Task */
+/**
+ * @brief Function implementing the Remote_TASK thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_Remote_Task */
+void Remote_TASK(void const *argument)
+{
+	/* USER CODE BEGIN Remote_Task */
+	/* Infinite loop */
+	for (;;)
+	{
+		Remote_task();
+	}
+	/* USER CODE END Remote_Task */
 }
 
 /* Private application code --------------------------------------------------*/

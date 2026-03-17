@@ -420,6 +420,11 @@
               <FileType>1</FileType>
               <FilePath>..\Application\Task\Src\PS2_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>Remote_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Task\Src\Remote_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

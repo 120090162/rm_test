@@ -1,11 +1,9 @@
 #include "Remote_Task.h"
+#include "Detect_Task.h"
+#include "Remote_Control.h"
 #include "cmsis_os.h"
 
-extern chassis_t chassis_move;
 uint32_t REMOTE_TIME = 10; // 遥控器任务运行周期10ms
-
-extern vmc_leg_t right;
-extern vmc_leg_t left;
 
 /**************************************************************************
 Function: Sbus Remote
@@ -16,16 +14,15 @@ Date	: 2024
 **************************************************************************/
 void Remote_task(void)
 {
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buff, BUFF_SIZE * 2);
 	float dt = REMOTE_TIME / 1000.0f;
 	static float last_jump_vrb = 0;
 	static uint32_t vbat_low_count = 0;
 
 	while (1)
 	{
-		if (remoter.online)
+		if (!remote_ctrl.rc_lost)
 		{
-			if (remoter.toggle.swd == 0)
+			if (remote_ctrl.rc.s[DT7_SW_LEFT] == 2)
 			{
 				// Power Off (遥控器SWD拨杆打下，关闭底盘)
 				chassis_move.start_flag = 0;
@@ -33,7 +30,7 @@ void Remote_task(void)
 
 				vbat_low_count = 0;
 			}
-			else if (remoter.toggle.swd == 1)
+			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == 3)
 			{
 				//				if(chassis_move.vbus > VBAT_LOW_VAL)
 				//				{
@@ -48,7 +45,7 @@ void Remote_task(void)
 				//					chassis_move.recover_flag=0;
 				//				}
 
-				if ((chassis_move.vbus < VBAT_LOW_VAL) && (chassis_move.start_flag == 1))
+				if (vbus_low_warning && (chassis_move.start_flag == 1))
 					vbat_low_count++;
 
 				// 低电量保护逻辑，低电量持续一段时间后自动断电保护
@@ -73,40 +70,32 @@ void Remote_task(void)
 
 			if (chassis_move.start_flag == 1)
 			{
-				if (chassis_move.vbus_mode == 1)
-				{
-					// 4s 电池供电时的速度映射
-					chassis_move.v_set = ((float)remoter.joy.right_vert) * (-0.00097f * 0.5f); // 摇杆向前推为负
-				}
-				else if (chassis_move.vbus_mode == 2)
-				{
-					// 6s 电池供电时的速度映射 (动力更强，倍率更高)
-					chassis_move.v_set = ((float)remoter.joy.right_vert) * (-0.00097f * 1.3f); // 摇杆向前推为负
-				}
+				// 6s 电池供电时的速度映射 (动力更强，倍率更高)
+				chassis_move.v_set = ((float)remote_ctrl.rc.ch[DT7_CH_RV]) * (-0.00097f * 1.3f); // 摇杆向前推为负
 				chassis_move.x_set = chassis_move.x_set + chassis_move.v_set * dt;
 
 				// 左摇杆水平方向控制偏航角 (Yaw转向)
-				chassis_move.turn_set += ((float)remoter.joy.left_hori) * (-0.0000625f);
+				chassis_move.turn_set += ((float)remote_ctrl.rc.ch[DT7_CH_LH]) * (-0.0000625f);
 
 				// SWA 拨杆控制横滚角 (Roll姿态)
-				if (remoter.toggle.swa == 0)
+				if (remote_ctrl.rc.ch[DT7_CH_ROLLER] == 0)
 				{
 					chassis_move.roll_set = -0.03f;
 				}
 				else
 				{
-					chassis_move.roll_set += ((float)remoter.joy.right_hori) * (0.000016f);
+					chassis_move.roll_set += ((float)remote_ctrl.rc.ch[DT7_CH_RH]) * (0.000016f);
 				}
 				mySaturate(&chassis_move.roll_set, -0.40f, 0.40f);
 
 				// SWC 拨杆结合左摇杆垂直方向控制腿长
-				if (remoter.toggle.swc == 0)
+				if (remote_ctrl.rc.ch[DT7_CH_ROLLER] == 0)
 				{
 					chassis_move.leg_set = 0.08f;
 				}
 				else
 				{
-					chassis_move.leg_set = (remoter.joy.left_vert + 1024) * (0.00007f) + 0.072f;
+					chassis_move.leg_set = (remote_ctrl.rc.ch[DT7_CH_LV] + 1024) * (0.00007f) + 0.072f;
 				}
 
 				mySaturate(&chassis_move.leg_set, 0.072f, 0.21f);
@@ -118,27 +107,27 @@ void Remote_task(void)
 				}
 				chassis_move.last_leg_set = chassis_move.leg_set;
 
-				// SWB 拨杆结合拨轮控制跳跃逻辑
-				if (remoter.toggle.swb == 0)
-				{
-					// chassis_move.jump_flag=0;
-					// chassis_move.jump_flag2=0;
-				}
-				else
-				{
-					// 触发跳跃条件：SWC未归零，拨轮拨动产生上升沿，且当前腿长允许跳跃
-					if (remoter.toggle.swc != 0 && remoter.var.b < 500 && last_jump_vrb >= 500 && chassis_move.leg_set <= 0.16f)
-					{
-						if (chassis_move.vbus_mode == 2)
-						{
-							// 6s 电源模式下才允许跳跃（保证动力足够）
-							chassis_move.jump_flag = 1;
-							chassis_move.jump_flag2 = 1;
-						}
-					}
-				}
+				// // SWB 拨杆结合拨轮控制跳跃逻辑
+				// if (remote_ctrl.toggle.swb == 0)
+				// {
+				// 	// chassis_move.jump_flag=0;
+				// 	// chassis_move.jump_flag2=0;
+				// }
+				// else
+				// {
+				// 	// 触发跳跃条件：SWC未归零，拨轮拨动产生上升沿，且当前腿长允许跳跃
+				// 	if (remote_ctrl.toggle.swc != 0 && remote_ctrl.var.b < 500 && last_jump_vrb >= 500 && chassis_move.leg_set <= 0.16f)
+				// 	{
+				// 		if (chassis_move.vbus_mode == 2)
+				// 		{
+				// 			// 6s 电源模式下才允许跳跃（保证动力足够）
+				// 			chassis_move.jump_flag = 1;
+				// 			chassis_move.jump_flag2 = 1;
+				// 		}
+				// 	}
+				// }
 
-				last_jump_vrb = remoter.var.b;
+				// last_jump_vrb = remote_ctrl.var.b;
 			}
 
 			else
@@ -163,8 +152,6 @@ void Remote_task(void)
 			chassis_move.leg_set = 0.08f;					// 原始腿长
 			chassis_move.roll_set = -0.03f;
 		}
-
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buff, BUFF_SIZE * 2); // 重新开启串口空闲中断DMA接收
 		osDelay(REMOTE_TIME);
 	}
 }
