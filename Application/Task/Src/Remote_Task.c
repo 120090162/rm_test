@@ -1,21 +1,25 @@
 #include "Remote_Task.h"
 #include "Detect_Task.h"
 #include "cmsis_os.h"
+#include "math.h"
 
 #include "robot_param.h"
 
-uint32_t REMOTE_TIME = 10; // 遥控器任务运行周期10ms
+uint32_t CHASS_FSM_TIME = 3; // 3ms的底盘控制周期，对齐底盘控制频率
 
-/**************************************************************************
-Function: Sbus Remote
-Input   : none
-Output  : none
-Auth    : DHY (qq:965849293)
-Date	: 2024
-**************************************************************************/
+static void UpdateCalibrateStatus(void);
+static void ChassisHandleException(void);
+static void ChassisSetMode(void);
+static void ChassisConsole(void);
+
 void Remote_task(void)
 {
-	float dt = REMOTE_TIME / 1000.0f;
+	while (INS.ins_flag == 0)
+	{ // 等待惯导(INS)初始化收敛完成
+		osDelay(1);
+	}
+
+	float dt = CHASS_FSM_TIME / 1000.0f;
 	static float last_jump_vrb = 0;
 	static uint32_t vbat_low_count = 0;
 
@@ -25,7 +29,21 @@ void Remote_task(void)
 
 	while (1)
 	{
-		if (!remote_ctrl.rc_lost)
+		// 处理异常
+		ChassisHandleException();
+		// 设置底盘模式
+		ChassisSetMode();
+		// 底盘状态量
+		UpdateCalibrateStatus();
+
+		// 遥控器输入处理
+		if (chassis_move.recover_flag == 1 ||
+			chassis_move.mode == CHASSIS_CALIBRATE ||
+			chassis_move.mode == CHASSIS_STAND_UP)
+		{
+			chassis_move.v_set = 0.0f; // 速度清零
+		}
+		else
 		{
 			if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_DOWN)
 			{
@@ -35,21 +53,8 @@ void Remote_task(void)
 
 				vbat_low_count = 0;
 			}
-			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP)
+			else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP || remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_MID)
 			{
-				//				if(chassis_move.vbus > VBAT_LOW_VAL)
-				//				{
-				//					//Power On
-				//					chassis_move.start_flag=1;
-				//				}
-				//				else
-				//				{
-				//
-				//					//Power Off
-				//					chassis_move.start_flag=0;
-				//					chassis_move.recover_flag=0;
-				//				}
-
 				if (vbus_low_warning && (chassis_move.start_flag == 1))
 					vbat_low_count++;
 
@@ -59,7 +64,7 @@ void Remote_task(void)
 					chassis_move.start_flag = 0;
 					chassis_move.recover_flag = 0;
 				}
-				else
+				else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP)
 				{
 					// Power On (遥控器SWD拨杆打上，启动底盘)
 					chassis_move.start_flag = 1;
@@ -146,19 +151,168 @@ void Remote_task(void)
 				chassis_move.roll_set = -0.03f;
 			}
 		}
-		else
-		{
-			// 遥控器离线 (失控保护)
-			chassis_move.start_flag = 0;
-			chassis_move.recover_flag = 0;
-			vbat_low_count = 0;
+		// else
+		// {
+		// 	// 遥控器离线 (失控保护)
+		// 	chassis_move.start_flag = 0;
+		// 	chassis_move.recover_flag = 0;
+		// 	vbat_low_count = 0;
 
-			chassis_move.v_set = 0.0f; // 速度清零
-			// chassis_move.x_set = chassis_move.x_filter;		// 保持位置
-			chassis_move.turn_set = chassis_move.total_yaw; // 保持偏航
-			chassis_move.leg_set = 0.08f;					// 原始腿长
-			chassis_move.roll_set = -0.03f;
+		// 	chassis_move.v_set = 0.0f; // 速度清零
+		// 	// chassis_move.x_set = chassis_move.x_filter;		// 保持位置
+		// 	chassis_move.turn_set = chassis_move.total_yaw; // 保持偏航
+		// 	chassis_move.leg_set = 0.08f;					// 原始腿长
+		// 	chassis_move.roll_set = -0.03f;
+		// }
+
+		// 计算控制量
+		ChassisConsole();
+
+		osDelay(CHASS_FSM_TIME);
+	}
+}
+
+static void UpdateCalibrateStatus(void)
+{
+	if ((chassis_move.mode == CHASSIS_CALIBRATE) &&
+		fabs(chassis_move.joint_motor[0]->Data.Position) < ZERO_POS_THRESHOLD &&
+		fabs(chassis_move.joint_motor[1]->Data.Position) < ZERO_POS_THRESHOLD &&
+		fabs(chassis_move.joint_motor[2]->Data.Position) < ZERO_POS_THRESHOLD &&
+		fabs(chassis_move.joint_motor[3]->Data.Position) < ZERO_POS_THRESHOLD)
+	{
+		CALIBRATE.calibrated = true;
+	}
+
+	// 校准模式的相关反馈数据
+	uint32_t now = HAL_GetTick();
+	if (chassis_move.mode == CHASSIS_CALIBRATE)
+	{
+		for (uint8_t i = 0; i < 4; i++)
+		{
+			CALIBRATE.velocity[i] = chassis_move.joint_motor[i]->Data.Velocity;
+			if (CALIBRATE.velocity[i] > CALIBRATE_STOP_VELOCITY)
+			{ // 速度大于阈值时重置计时
+				CALIBRATE.reached[i] = false;
+				CALIBRATE.stop_time[i] = now;
+			}
+			else
+			{
+				if (now - CALIBRATE.stop_time[i] > CALIBRATE_STOP_TIME)
+				{
+					CALIBRATE.reached[i] = true;
+				}
+			}
 		}
-		osDelay(REMOTE_TIME);
+	}
+}
+
+/**
+ * @brief          异常处理
+ * @param[in]      none
+ * @retval         none
+ */
+void ChassisHandleException(void)
+{
+	if (GetRcOffline())
+	{
+		chassis_move.error_code |= DBUS_ERROR_OFFSET;
+	}
+	else
+	{
+		chassis_move.error_code &= ~DBUS_ERROR_OFFSET;
+	}
+
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		if (fabs(chassis_move.joint_motor[i]->Data.Torque) > MAX_TORQUE_PROTECT)
+		{
+			chassis_move.error_code |= JOINT_ERROR_OFFSET;
+			break;
+		}
+	}
+
+	if ((chassis_move.mode == CHASSIS_OFF || chassis_move.mode == CHASSIS_SAFE) &&
+		fabs(stand_up_pid.Param.LimitOutput) != 0.0f)
+	{
+		PID_Calc_Clear(&stand_up_pid);
+	}
+}
+
+/**
+ * @brief          设置模式
+ * @param[in]      none
+ * @retval         none
+ */
+void ChassisSetMode(void)
+{
+	if (chassis_move.error_code & DBUS_ERROR_OFFSET)
+	{ // 遥控器出错时的状态处理
+		chassis_move.mode = CHASSIS_SAFE;
+		return;
+	}
+
+	if (chassis_move.error_code & JOINT_ERROR_OFFSET)
+	{ // 关节电机出错时的状态处理
+		chassis_move.mode = CHASSIS_SAFE;
+		return;
+	}
+
+	if (chassis_move.mode == CHASSIS_CALIBRATE && (!CALIBRATE.calibrated))
+	{ // 校准完成后才退出校准
+		return;
+	}
+
+	if (CALIBRATE.toggle)
+	{ // 切入底盘校准
+		CALIBRATE.toggle = false;
+		chassis_move.mode = CHASSIS_CALIBRATE;
+		CALIBRATE.calibrated = false;
+
+		uint32_t now = HAL_GetTick();
+		for (uint8_t i = 0; i < 4; i++)
+		{
+			CALIBRATE.reached[i] = false;
+			CALIBRATE.stop_time[i] = now;
+		}
+
+		return;
+	}
+
+	if (chassis_move.recover_flag == 1) // 倒地自恢复状态
+	{
+		chassis_move.mode = CHASSIS_OFF_HOOK;
+	}
+}
+
+/**
+ * @brief          计算控制量
+ * @param[in]      none
+ * @retval         none
+ */
+void ChassisConsole(void)
+{
+	switch (chassis_move.mode)
+	{
+	case CHASSIS_CALIBRATE:
+	{
+		ConsoleCalibrate();
+	}
+	break;
+	case CHASSIS_OFF_HOOK:
+	{
+		// ConsoleOffHook();
+	}
+	break;
+	case CHASSIS_STAND_UP:
+	{
+		// ConsoleStandUp();
+	}
+	break;
+	case CHASSIS_OFF:
+	case CHASSIS_SAFE:
+	default:
+	{
+		// ConsoleZeroForce();
+	}
 	}
 }

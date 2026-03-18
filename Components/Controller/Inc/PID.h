@@ -142,4 +142,9 @@ extern void PID_Init(PID_Info_TypeDef *Pid, PID_Type_e type, float para[PID_PARA
  */
 extern float PID_Calculate(PID_Info_TypeDef *PID, float Target, float Measure);
 
+/**
+ * @brief  Clear the PID calculation history data
+ */
+extern void PID_Calc_Clear(PID_Info_TypeDef *PID);
+
 #endif // CONTROLLER_PID_H

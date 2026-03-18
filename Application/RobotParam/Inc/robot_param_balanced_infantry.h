@@ -43,11 +43,6 @@
 #define W0_DIRECTION ( 1)
 #define W1_DIRECTION (-1)
 
-// DM控制参数
-#define CALIBRATE_VEL_KP  (4.0f)  // 校准MIT速度控制KP
-#define DEBUG_VEL_KP      (4.0f)  // 调试MIT速度控制KP
-#define ZERO_FORCE_VEL_KP (4.0f)  // 无力MIT速度控制KP
-
 #define NORMAL_POS_KP (20.0f) // 正常MIT位置控制KP
 #define NORMAL_POS_KD (1.0f)  // 正常MIT位置控制KD
 
@@ -77,7 +72,6 @@
 //upper_limit parameters ---------------------
 
 #define MAX_DELTA_ROD_ANGLE (0.25f) // (rad)腿摆角最大变化量
-#define MAX_TORQUE_PROTECT  (25.0f)  // (Nm)最大扭矩保护
 
 #define MAX_DELTA_VEL_FDB_TO_REF (0.8f) // (m/s)速度反馈到参考速度的最大变化量
 
