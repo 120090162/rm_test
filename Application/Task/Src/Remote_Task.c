@@ -37,9 +37,9 @@ void Remote_task(void)
 		UpdateCalibrateStatus();
 
 		// 遥控器输入处理
-		if (chassis_move.recover_flag == 1 ||
-			chassis_move.mode == CHASSIS_CALIBRATE ||
-			chassis_move.mode == CHASSIS_STAND_UP)
+		if (chassis_move.start_flag == 1 && (chassis_move.recover_flag == 1 ||
+											 chassis_move.mode == CHASSIS_CALIBRATE ||
+											 chassis_move.mode == CHASSIS_STAND_UP))
 		{
 			chassis_move.v_set = 0.0f; // 速度清零
 		}
@@ -64,11 +64,16 @@ void Remote_task(void)
 					chassis_move.start_flag = 0;
 					chassis_move.recover_flag = 0;
 				}
-				else if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP)
+				else
 				{
 					// Power On (遥控器SWD拨杆打上，启动底盘)
 					chassis_move.start_flag = 1;
 				}
+			}
+
+			if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP && remote_ctrl.rc.s[DT7_SW_RIGHT] == DT7_SW_UP)
+			{
+				CALIBRATE.toggle = true;
 			}
 
 			// 倒地检测与自恢复逻辑 (当俯仰角过大判定为倒地时)

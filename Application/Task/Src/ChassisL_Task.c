@@ -10,8 +10,6 @@ void ChassisL_task(void)
 
     while (1)
     {
-        osDelay(CHASS_TIME * 3);
-
         if (chassis_move.start_flag == 1)
         {
             switch (chassis_move.mode)
@@ -47,6 +45,11 @@ void ChassisL_task(void)
                 osDelay(CHASS_TIME);
             }
             }
+        }
+        else
+        {
+            // 其他模式不控制电机，保持电机状态
+            osDelay(CHASS_TIME * 3);
         }
     }
 }

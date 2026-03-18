@@ -35,10 +35,10 @@ void mySaturate(float *in, float min, float max)
  */
 void ConsoleCalibrate(void)
 {
-    left.torque_set[0] = -CALIBRATE_VELOCITY;
-    left.torque_set[1] = CALIBRATE_VELOCITY;
-    right.torque_set[0] = CALIBRATE_VELOCITY;
-    right.torque_set[1] = -CALIBRATE_VELOCITY;
+    left.velocity_set[0] = -CALIBRATE_VELOCITY;
+    left.velocity_set[1] = CALIBRATE_VELOCITY;
+    right.velocity_set[0] = CALIBRATE_VELOCITY;
+    right.velocity_set[1] = -CALIBRATE_VELOCITY;
 
     left.wheel_T = 0;
     right.wheel_T = 0;
