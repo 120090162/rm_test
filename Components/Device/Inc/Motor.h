@@ -247,4 +247,6 @@ extern void LK_Motor_CAN_TxMessage(FDCAN_TxFrame_TypeDef *FDCAN_TxFrame, LK_Moto
 
 extern bool ScanOfflineMotor(void);
 
+extern fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
+
 #endif // DEVICE_MOTOR_H

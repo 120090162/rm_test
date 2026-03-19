@@ -136,8 +136,6 @@ static float uint_to_float(int X_int, float X_min, float X_max, int Bits);
 
 static int float_to_uint(float x, float x_min, float x_max, int bits);
 
-static fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
-
 //------------------------------------------------------------------------------
 
 /**

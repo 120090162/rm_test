@@ -14,11 +14,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "LPF.h"
+#include "User_Lib.h"
 
-float sign(float input)
-{
-	return (input > 0.0f) - (input < 0.0f);
-}
+// float sign(float input)
+// {
+// 	return (input > 0.0f) - (input < 0.0f);
+// }
 
 /**
  * @brief 初始化一阶低通滤波器.

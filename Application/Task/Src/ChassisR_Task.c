@@ -15,6 +15,16 @@ void ChassisR_task(void)
         {
             switch (chassis_move.mode)
             {
+            case CHASSIS_STAND_UP:
+            {
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[2], right.position_set[0], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                osDelay(CHASS_TIME);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], right.position_set[1], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                osDelay(CHASS_TIME);
+                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, right.wheel_T);
+                osDelay(CHASS_TIME);
+            }
+            break;
             case CHASSIS_CALIBRATE:
             {
                 DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[2], 0, right.velocity_set[0], 0, CALIBRATE_VEL_KD, 0);
@@ -24,15 +34,13 @@ void ChassisR_task(void)
                 LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, right.wheel_T);
                 osDelay(CHASS_TIME);
 
-                // if (CALIBRATE.reached[0] && CALIBRATE.reached[1])
-                // {
-                //     DmSavePosZero(&CHASSIS.joint_motor[0]);
-                //     osDelay(CHASS_TIME);
-                //     DmSavePosZero(&CHASSIS.joint_motor[1]);
-                //     delay_us(DM_DELAY);
-                //     DmSavePosZero(&CHASSIS.joint_motor[2]);
-                //     osDelay(CHASS_TIME);
-                // }
+                if (CALIBRATE.reached[2] && CALIBRATE.reached[3])
+                {
+                    DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[2], DM_Motor_Save_Zero_Position);
+                    osDelay(CHASS_TIME);
+                    DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[3], DM_Motor_Save_Zero_Position);
+                    osDelay(CHASS_TIME * 2);
+                }
             }
             break;
             case CHASSIS_SAFE:

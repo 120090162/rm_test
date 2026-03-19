@@ -52,8 +52,10 @@
 
 ## note
 x -> roll
-y -> pitch
+y -> pitch -> phi
 z -> yaw
+
+电机旋转方向逆时针为正
 
 ![imu方向定义和can_id设置]()
 
@@ -64,6 +66,8 @@ z -> yaw
 [ps2使用](https://www.bilibili.com/video/BV1pT411a72s/?spm_id_from=333.337.search-card.all.click&vd_source=a61233bf2bcd88af9cb7538da95fa883)
 
 `.old` 文件是一些旧的测试文件，方便学习测试传感器
+
+`tools/matlab_balance` 文件夹下的文件是计算LQR用的
 
 ## trouble
 似乎一条can线上接四个达妙电机加两个翎控电机有点不稳定，可能需要调整成两路can控制

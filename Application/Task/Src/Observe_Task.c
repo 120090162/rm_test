@@ -53,11 +53,12 @@ void Observe_task(void)
 
 	while (1)
 	{
-		wr = -chassis_move.wheel_motor[0]->Data.Velocity - INS.Gyro[1] + right.d_alpha;									  // 右轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
-		vrb = wr * 0.0603f + right.L0 * right.d_theta * arm_cos_f32(right.theta) + right.d_L0 * arm_sin_f32(right.theta); // 运动学正解：计算右侧机体在 b系(机体坐标系) 下的线速度
+		// 参考https://zhuanlan.zhihu.com/p/689921165
+		wr = -chassis_move.wheel_motor[0]->Data.Velocity - INS.Gyro[1] + right.d_alpha;										   // 右轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
+		vrb = wr * WHEEL_RADIUS + right.L0 * right.d_theta * arm_cos_f32(right.theta) + right.d_L0 * arm_sin_f32(right.theta); // 运动学正解：计算右侧机体在 b系(机体坐标系) 下的线速度
 
-		wl = -chassis_move.wheel_motor[1]->Data.Velocity + INS.Gyro[1] + left.d_alpha;								 // 左轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
-		vlb = wl * 0.0603f + left.L0 * left.d_theta * arm_cos_f32(left.theta) + left.d_L0 * arm_sin_f32(left.theta); // 运动学正解：计算左侧机体在 b系(机体坐标系) 下的线速度
+		wl = -chassis_move.wheel_motor[1]->Data.Velocity + INS.Gyro[1] + left.d_alpha;									  // 左轮相对地面的转动角速度（由电机速度、机体俯仰角速度、腿部关节角速度合成，这里规定顺时针为正）
+		vlb = wl * WHEEL_RADIUS + left.L0 * left.d_theta * arm_cos_f32(left.theta) + left.d_L0 * arm_sin_f32(left.theta); // 运动学正解：计算左侧机体在 b系(机体坐标系) 下的线速度
 
 		aver_v = (vrb - vlb) / 2.0f; // 取左右两侧速度的平均值，得到底盘中心的前进速度
 		xvEstimateKF_Update(&vaEstimateKF, -INS.MotionAccel_b[0], aver_v);

@@ -19,6 +19,10 @@ void Remote_task(void)
 		osDelay(1);
 	}
 
+	// pid init
+	float Stand_Up_PID_Param[PID_PARAMETER_NUM] = {KP_CHASSIS_STAND_UP, KI_CHASSIS_STAND_UP, KD_CHASSIS_STAND_UP, 0, 0, MAX_IOUT_CHASSIS_STAND_UP, MAX_OUT_CHASSIS_STAND_UP};
+	PID_Init(&stand_up_pid, PID_POSITION, Stand_Up_PID_Param);
+
 	float dt = CHASS_FSM_TIME / 1000.0f;
 	static float last_jump_vrb = 0;
 	static uint32_t vbat_low_count = 0;
@@ -71,9 +75,14 @@ void Remote_task(void)
 				}
 			}
 
-			if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP && remote_ctrl.rc.s[DT7_SW_RIGHT] == DT7_SW_UP)
+			if (ENABLE_CHASSIS_CALIBRATE && remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP && remote_ctrl.rc.s[DT7_SW_RIGHT] == DT7_SW_UP)
 			{
 				CALIBRATE.toggle = true;
+			}
+
+			if (remote_ctrl.rc.s[DT7_SW_LEFT] == DT7_SW_UP && remote_ctrl.rc.s[DT7_SW_RIGHT] == DT7_SW_DOWN)
+			{
+				chassis_move.mode = CHASSIS_STAND_UP;
 			}
 
 			// 倒地检测与自恢复逻辑 (当俯仰角过大判定为倒地时)
@@ -310,7 +319,7 @@ void ChassisConsole(void)
 	break;
 	case CHASSIS_STAND_UP:
 	{
-		// ConsoleStandUp();
+		ConsoleStandUp();
 	}
 	break;
 	case CHASSIS_OFF:

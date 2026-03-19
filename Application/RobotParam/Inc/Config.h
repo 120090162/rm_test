@@ -159,4 +159,7 @@
 #define RC_ONLINE_CNT 10U
 #define RC_OFFLINE_CNT 5U
 
+// 是否启用底盘校准功能
+#define ENABLE_CHASSIS_CALIBRATE true
+
 #endif // ROBOT_CONFIG_H

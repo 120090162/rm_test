@@ -55,6 +55,7 @@ typedef struct
 
 	float torque_set[2];   // 0是前腿，1是后腿的关节电机扭矩控制量
 	float velocity_set[2]; // 0是前腿，1是后腿的关节电机速度控制量
+	float position_set[2]; // 0是前腿，1是后腿的关节电机位置控制量
 	float wheel_T;		   // 轮毂电机的扭矩控制量
 
 	float F0;
@@ -155,5 +156,6 @@ extern PID_Info_TypeDef stand_up_pid;
 extern void mySaturate(float *in, float min, float max);
 
 extern void ConsoleCalibrate(void);
+extern void ConsoleStandUp(void);
 
 #endif

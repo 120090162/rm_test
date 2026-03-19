@@ -67,6 +67,4 @@ extern "C"
 	 * @brief 根据函数中指定的参数更新（计算）二阶低通滤波器
 	 */
 	extern float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *lpf, float input);
-
-	extern float sign(float input);
 #endif // LOWPASS_FILTER_H
