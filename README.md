@@ -83,10 +83,10 @@ z -> yaw
 
 使用指南见 `tools/ps2MeArmV1.5.pdf`, 连线如下
 
-PA00 - DI
-PA02 - DO
-PE09 - CS
-PE13 - CLK
+PA00 - DI - DAT
+PA02 - DO - CMD
+PE09 - CS - CS
+PE13 - CLK - CLK
 
 控制手册：
 
