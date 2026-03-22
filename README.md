@@ -67,13 +67,28 @@ z -> yaw
 
 `.old` 文件是一些旧的测试文件，方便学习测试传感器
 
-`tools/matlab_balance` 文件夹下的文件是计算LQR用的
+`tools/matlab_balance` 文件夹下的文件是计算LQR用的，运行 `get_k.m` 即可
+```bash
+// 参考运行环境
+// matlab R2024a
+// add ons: Symbolic Math Toolbox
+```
+
 
 ## trouble
 似乎一条can线上接四个达妙电机加两个翎控电机有点不稳定，可能需要调整成两路can控制
 
 ## 遥控器
 - **PS2手柄**
+
+使用指南见 `tools/ps2MeArmV1.5.pdf`, 连线如下
+
+PA00 - DI
+PA02 - DO
+PE09 - CS
+PE13 - CLK
+
+控制手册：
 
 1. 数字按键 (Button)
 

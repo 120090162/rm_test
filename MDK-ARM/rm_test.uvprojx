@@ -585,6 +585,11 @@
               <FileType>1</FileType>
               <FilePath>..\Components\Algorithm\Src\QuaternionEKF.c</FilePath>
             </File>
+            <File>
+              <FileName>VMC_Calc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Components\Algorithm\Src\VMC_Calc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

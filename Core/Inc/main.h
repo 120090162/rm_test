@@ -73,6 +73,10 @@ extern "C"
 #define DI_GPIO_Port GPIOA
 #define DO_Pin GPIO_PIN_2
 #define DO_GPIO_Port GPIOA
+#define CS_Pin GPIO_PIN_9
+#define CS_GPIO_Port GPIOE
+#define CLK_Pin GPIO_PIN_13
+#define CLK_GPIO_Port GPIOE
 
 	/* USER CODE BEGIN Private defines */
 

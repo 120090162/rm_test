@@ -21,9 +21,6 @@
 #include "robot_typedef.h"
 #include "struct_typedef.h"
 
-// 导入具体的机器人参数配置文件
-#include "robot_param_balanced_infantry.h"
-
 // 机器人速度限制参数
 #define MAX_SPEED_VECTOR_VX (3.5f)
 #define MAX_SPEED_VECTOR_VY (3.5f)
@@ -45,6 +42,10 @@
 #define MIN_J1_ANGLE (-1.8f) // (rad)关节角度下限
 #define MIN_J2_ANGLE (-1.8f) // (rad)关节角度下限
 #define MIN_J3_ANGLE (0.0f)  // (rad)关节角度下限
+#define MAX_J0_ANGLE (1.8f)  // (rad)关节角度上限
+#define MAX_J1_ANGLE (0.0f)  // (rad)关节角度上限
+#define MAX_J2_ANGLE (0.6f)  // (rad)关节角度上限
+#define MAX_J3_ANGLE (1.8f)  // (rad)关节角度上限
 // DM电机初始角度与水平线的关系
 #define J0_ANGLE_OFFSET (-0.19163715f + M_PI) // (rad)关节0角度偏移量(电机0点到水平线的夹角)
 #define J1_ANGLE_OFFSET (0.19163715f)         // (rad)关节1角度偏移量(电机0点到水平线的夹角)
@@ -78,5 +79,12 @@
 #define WHEEL_ERROR_OFFSET ((uint8_t)1 << 1) // 驱动轮电机错误偏移量
 #define DBUS_ERROR_OFFSET ((uint8_t)1 << 2)  // dbus错误偏移量
 #define FLOATING_OFFSET ((uint8_t)1 << 3)    // 悬空状态偏移量
+
+// 起立用的pid
+#define KP_CHASSIS_STAND_UP (2000.0f)
+#define KI_CHASSIS_STAND_UP (0.0f)
+#define KD_CHASSIS_STAND_UP (10.0f)
+#define MAX_IOUT_CHASSIS_STAND_UP (0.0f)
+#define MAX_OUT_CHASSIS_STAND_UP (2000.0f)
 
 #endif /* ROBOT_PARAM_H */
