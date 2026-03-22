@@ -48,7 +48,7 @@ static void DWT_CNT_Update(void)
 	volatile uint32_t cnt_now = DWT->CYCCNT;
 
 	if (cnt_now < CYCCNT_LAST)
-		CYCCNT_RountCount++; // 进位
+		CYCCNT_RountCount++; // 进位, 溢出
 
 	CYCCNT_LAST = cnt_now;
 }

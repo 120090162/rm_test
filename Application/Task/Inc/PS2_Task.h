@@ -72,5 +72,6 @@ void PS2_ExitConfing(void);		 // 退出配置
 void PS2_SetInit(void);			 // 设置初始化
 
 extern void pstwo_task(void);
+extern void jump_key(chassis_t *chassis, ps2data_t *data);
 
 #endif

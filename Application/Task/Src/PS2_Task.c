@@ -202,6 +202,25 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 	}
 }
 
+void jump_key(chassis_t *chassis, ps2data_t *data)
+{
+	if (data->key == 12)
+	{
+		if (++chassis->count_key > 10)
+		{
+			if (chassis->jump_flag == 0)
+			{
+				chassis->jump_flag = 1;
+				chassis->jump_leg = chassis->leg_set;
+			}
+		}
+	}
+	else
+	{
+		chassis->count_key = 0;
+	}
+}
+
 // 判断是否为红灯模式,0x41=模拟绿灯，0x73=模拟红灯
 // 返回值：0为红灯模式
 //		  其它为绿灯模式
@@ -248,27 +267,29 @@ void PS2_ReadData(void)
 	case PS2_MODE_VIBRATION:
 	case PS2_MODE_CONFIG:
 		ps2_mode = Data[1];
+		ps2_lost = false;
 		break;
 	default:
 		ps2_mode = PS2_MODE_ERROR;
-	}
-
-	switch (ps2_mode)
-	{
-	case PS2_MODE_CONFIG:
-	case PS2_MODE_DIGITAL:
-	case PS2_MODE_ANALOG:
-	case PS2_MODE_VIBRATION:
-	{
-		ps2_lost = false;
-	}
-
-	case PS2_MODE_ERROR:
-	default:
-	{
 		ps2_lost = true;
 	}
-	}
+
+	// switch (ps2_mode)
+	// {
+	// case PS2_MODE_CONFIG:
+	// case PS2_MODE_DIGITAL:
+	// case PS2_MODE_ANALOG:
+	// case PS2_MODE_VIBRATION:
+	// {
+	// 	ps2_lost = false;
+	// }
+
+	// case PS2_MODE_ERROR:
+	// default:
+	// {
+	// 	ps2_lost = true;
+	// }
+	// }
 }
 
 // 将读取到的PS2数据进行处理,只提取按键值
