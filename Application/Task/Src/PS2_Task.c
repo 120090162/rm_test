@@ -204,21 +204,22 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 void jump_key(chassis_t *chassis, ps2data_t *data)
 {
-	if (data->key == 12)
-	{
-		if (++chassis->count_key > 10)
-		{
-			if (chassis->jump_flag == 0)
-			{
-				chassis->jump_flag = 1;
-				chassis->jump_leg = chassis->leg_set;
-			}
-		}
-	}
-	else
-	{
-		chassis->count_key = 0;
-	}
+	// if (data->key == 12)
+	// {
+	// 	if (++chassis->count_key > 10)
+	// 	{
+	// 		if (chassis->jump_flag == 0)
+	// 		{
+	// 			chassis->jump_flag = 1;
+	// 			chassis->jump_leg = chassis->leg_set;
+	// 		}
+	// 	}
+	// }
+	// else
+	// {
+	// 	chassis->count_key = 0;
+	// }
+	;
 }
 
 // 判断是否为红灯模式,0x41=模拟绿灯，0x73=模拟红灯

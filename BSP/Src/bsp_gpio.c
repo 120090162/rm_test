@@ -24,6 +24,6 @@
 void BSP_GPIO_Init(void)
 {
 
-    //	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_14,1);
-    //  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,1);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET); // Power_OUT2_ON
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); // Power_OUT1_ON
 }
