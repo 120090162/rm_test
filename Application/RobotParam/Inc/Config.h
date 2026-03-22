@@ -154,7 +154,7 @@
 // 启用裁判系统离线检测
 #define ENABLE_CHECK_REFEREE_OFFLINE false
 // 启用电池电压过低报警
-#define ENABLE_ALARM_VBAT_LOW false
+#define ENABLE_ALARM_VBAT_LOW true
 
 #define RC_ONLINE_CNT 10U
 #define RC_OFFLINE_CNT 5U

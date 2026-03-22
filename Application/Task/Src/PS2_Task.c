@@ -41,7 +41,8 @@ uint16_t MASK[] = {
 	PSB_PINK,
 }; // 按键值屏蔽掩码
 
-bool ps2_lost = true; // ps2手柄离线标志位，初始为离线
+bool ps2_lost = true;		// ps2手柄离线标志位，初始为离线
+uint32_t last_operate_time; // 上次操作时间
 uint16_t ps2_mode;
 
 uint32_t PS2_TIME = 10; // ps2手柄任务运行周期10ms
@@ -51,17 +52,31 @@ void pstwo_task(void)
 
 	while (1)
 	{
-		if (Data[1] != 0x73)
+		if (Data[1] != PS2_MODE_ANALOG)
 		{
+			ps2_lost = true;
 			PS2_SetInit();
 		}
+
+		ps2data.last_lx = ps2data.lx;
+		ps2data.last_ly = ps2data.ly;
+		ps2data.last_rx = ps2data.rx;
+		ps2data.last_ry = ps2data.ry;
 
 		PS2_data_read(&ps2data);											  // 读数据
 		PS2_data_process(&ps2data, &chassis_move, (float)PS2_TIME / 1000.0f); // 处理数据，下发底盘控制命令
 
+		// 判断数据变化
+		if (ps2data.key != ps2data.last_key || ps2data.lx != ps2data.last_lx || ps2data.ly != ps2data.last_ly || ps2data.rx != ps2data.last_rx || ps2data.ry != ps2data.last_ry)
+		{
+			last_operate_time = HAL_GetTick(); // 更新上次操作时间
+		}
+
 		osDelay(PS2_TIME);
 	}
 }
+
+uint32_t GetPs2IdleTime(void) { return HAL_GetTick() - last_operate_time; }
 
 // 向手柄发送命令
 void PS2_Cmd(uint8_t CMD)
@@ -124,10 +139,16 @@ void PS2_data_read(ps2data_t *data)
 	}
 }
 
-extern vmc_leg_t right;
-extern vmc_leg_t left;
 void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 {
+	if (Data[1] == PS2_MODE_ANALOG)
+	{
+		ps2_lost = false;
+	}
+	else
+	{
+		return;
+	}
 	if (data->last_key != 4 && data->key == 4 && chassis->start_flag == 0)
 	{
 		// 手柄上的Start按键被按下
@@ -242,8 +263,6 @@ void PS2_ReadData(void)
 	volatile uint8_t byte = 0;
 	volatile uint16_t ref = 0x01;
 
-	taskENTER_CRITICAL();
-
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET); // CS_L
 	PS2_Cmd(Comd[0]);									  // 开始命令
 	PS2_Cmd(Comd[1]);									  // 请求数据
@@ -263,8 +282,6 @@ void PS2_ReadData(void)
 	}
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET); // CS_H
 
-	taskEXIT_CRITICAL();
-
 	// 更新模式
 	switch (Data[1])
 	{
@@ -273,29 +290,10 @@ void PS2_ReadData(void)
 	case PS2_MODE_VIBRATION:
 	case PS2_MODE_CONFIG:
 		ps2_mode = Data[1];
-		ps2_lost = false;
 		break;
 	default:
 		ps2_mode = PS2_MODE_ERROR;
-		ps2_lost = true;
 	}
-
-	// switch (ps2_mode)
-	// {
-	// case PS2_MODE_CONFIG:
-	// case PS2_MODE_DIGITAL:
-	// case PS2_MODE_ANALOG:
-	// case PS2_MODE_VIBRATION:
-	// {
-	// 	ps2_lost = false;
-	// }
-
-	// case PS2_MODE_ERROR:
-	// default:
-	// {
-	// 	ps2_lost = true;
-	// }
-	// }
 }
 
 // 将读取到的PS2数据进行处理,只提取按键值

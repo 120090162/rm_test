@@ -23,6 +23,7 @@ static uint32_t CPU_FREQ_Hz_ms;
 static uint32_t CPU_FREQ_Hz_us;
 static uint32_t CYCCNT_RountCount;
 static uint32_t CYCCNT_LAST;
+static uint32_t ticks_per_us;
 
 void BSP_DWT_Init(uint32_t CPU_Freq_mHz)
 {
@@ -40,6 +41,7 @@ void BSP_DWT_Init(uint32_t CPU_Freq_mHz)
 	CPU_FREQ_Hz = CPU_Freq_mHz * 1000000;
 	CPU_FREQ_Hz_ms = CPU_FREQ_Hz / 1000;
 	CPU_FREQ_Hz_us = CPU_FREQ_Hz / 1000000;
+	ticks_per_us = CPU_Freq_mHz;
 	CYCCNT_RountCount = 0;
 }
 
@@ -126,4 +128,12 @@ void DWT_Delay(float Delay)
 	while ((DWT->CYCCNT - tickstart) < wait * (float)CPU_FREQ_Hz)
 	{
 	}
+}
+
+void DWT_Delay_us(uint32_t us)
+{
+	uint32_t tickstart = DWT->CYCCNT;
+	uint32_t wait = us * ticks_per_us;
+	while ((DWT->CYCCNT - tickstart) < wait)
+		;
 }

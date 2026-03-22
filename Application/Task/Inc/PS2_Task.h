@@ -46,6 +46,11 @@ typedef struct
 	int16_t rx; // 右摇杆X轴方向模拟量
 	int16_t ry; // 右摇杆Y轴方向模拟量
 
+	int16_t last_lx; // 上一次左摇杆X轴方向模拟量
+	int16_t last_ly; // 上一次左摇杆Y轴方向模拟量
+	int16_t last_rx; // 上一次右摇杆X轴方向模拟量
+	int16_t last_ry; // 上一次右摇杆Y轴方向模拟量
+
 } ps2data_t;
 
 extern uint8_t Data[9];
@@ -53,6 +58,8 @@ extern uint16_t MASK[16];
 extern uint16_t Handkey;
 
 extern bool ps2_lost;
+
+extern uint32_t GetPs2IdleTime(void); // 获取手柄空闲时间
 
 extern void PS2_data_read(ps2data_t *data);
 extern void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt);

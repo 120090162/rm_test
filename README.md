@@ -74,14 +74,17 @@ z -> yaw
 // add ons: Symbolic Math Toolbox
 ```
 
+因为开启了D-Cache，dma使用的时候需要声明缓存的储存位置，详细说明见 `main.c`
 
 ## trouble
 似乎一条can线上接四个达妙电机加两个翎控电机有点不稳定，可能需要调整成两路can控制
 
+PC15的接口需要接5v以上电源才能使用，平常烧录器提供的2.7v电压无法满足
+
 ## 遥控器
 - **PS2手柄**
 
-使用指南见 `tools/ps2MeArmV1.5.pdf`, 连线如下
+使用指南见 `doc/ps2MeArmV1.5.pdf`, 连线如下
 
 PA00 - DI - DAT
 PA02 - DO - CMD

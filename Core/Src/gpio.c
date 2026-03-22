@@ -89,6 +89,7 @@ void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pin = DI_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	HAL_GPIO_Init(DI_GPIO_Port, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : PtPin */

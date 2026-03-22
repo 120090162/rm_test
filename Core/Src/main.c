@@ -92,10 +92,11 @@ int main(void)
 	/* Enable the CPU Cache */
 
 	/* Enable I-Cache---------------------------------------------------------*/
-	SCB_EnableICache();
+	// SCB_EnableICache(); // 启用指令缓存, 会导致遥控器数据读取出问题
+	// 虽然可以通过增加延迟的方式解决，但需要大量调试，遂暂时关闭
 
 	/* Enable D-Cache---------------------------------------------------------*/
-	SCB_EnableDCache();
+	SCB_EnableDCache(); // 启用数据缓存, 需要dma数据启用 __attribute__((section(".AXI_SRAM"))) 进行修饰
 
 	/* MCU Configuration--------------------------------------------------------*/
 

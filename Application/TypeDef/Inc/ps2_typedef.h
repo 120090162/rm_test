@@ -7,5 +7,7 @@
 #define PS2_MODE_VIBRATION 0x79 // 模拟模式，加入了手柄马达的控制
 #define PS2_MODE_CONFIG 0xF3    // 设置模式，用于配置手柄
 
+#define PS2_IDLE_TIMEOUT 5000 // 5s无操作视为离线
+
 #endif // PS2_TYPEDEF_H__
 /*------------------------------ End of File ------------------------------*/

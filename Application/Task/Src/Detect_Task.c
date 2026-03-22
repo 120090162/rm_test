@@ -17,12 +17,15 @@
 #include "Detect_Task.h"
 #include "Config.h"
 #include "Remote_Control.h"
+#include "PS2_Task.h"
 #include "bsp_adc.h"
 
 float VBAT_WARNNING_VAL;
 float VBAT_LOW_VAL;
 float vbus;
 bool vbus_low_warning;
+
+uint32_t DETECT_TIME = 10; // 检测任务运行周期10ms
 
 /**
  * @note turn on:  800
@@ -61,7 +64,16 @@ void Detect_Task(void)
         {
             Remote_Message_Moniter(&remote_ctrl); // 监测遥控器在线状态
         }
-        osDelay(100); // 100ms检测一次
+
+        if (ENABLE_ALARM_PS2_OFFLINE)
+        {
+            if (GetPs2IdleTime() > PS2_IDLE_TIMEOUT)
+            {
+                ps2_lost = true; // ps2手柄离线
+            }
+        }
+
+        osDelay(DETECT_TIME);
     }
     /* USER CODE END Detect_Task */
 }
