@@ -241,6 +241,9 @@ void PS2_ReadData(void)
 {
 	volatile uint8_t byte = 0;
 	volatile uint16_t ref = 0x01;
+
+	taskENTER_CRITICAL();
+
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET); // CS_L
 	PS2_Cmd(Comd[0]);									  // 开始命令
 	PS2_Cmd(Comd[1]);									  // 请求数据
@@ -259,6 +262,8 @@ void PS2_ReadData(void)
 		DWT_Delay(0.000016f);
 	}
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET); // CS_H
+
+	taskEXIT_CRITICAL();
 
 	// 更新模式
 	switch (Data[1])
