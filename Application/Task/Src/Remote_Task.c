@@ -5,13 +5,6 @@
 
 #include "robot_param.h"
 
-uint32_t CHASS_FSM_TIME = 3; // 3ms的底盘控制周期，对齐底盘控制频率
-
-static void UpdateCalibrateStatus(void);
-static void ChassisHandleException(void);
-static void ChassisSetMode(void);
-static void ChassisConsole(void);
-
 void Remote_task(void)
 {
 	while (INS.ins_flag == 0)
@@ -63,7 +56,7 @@ void Remote_task(void)
 					vbat_low_count++;
 
 				// 低电量保护逻辑，低电量持续一段时间后自动断电保护
-				if (vbat_low_count > 100)
+				if (vbat_low_count > VBAT_LOW_WARNING_THRESHOLD)
 				{
 					chassis_move.start_flag = 0;
 					chassis_move.recover_flag = 0;
@@ -183,150 +176,5 @@ void Remote_task(void)
 		ChassisConsole();
 
 		osDelay(CHASS_FSM_TIME);
-	}
-}
-
-static void UpdateCalibrateStatus(void)
-{
-	if ((chassis_move.mode == CHASSIS_CALIBRATE) &&
-		fabs(chassis_move.joint_motor[0]->Data.Position) < ZERO_POS_THRESHOLD &&
-		fabs(chassis_move.joint_motor[1]->Data.Position) < ZERO_POS_THRESHOLD &&
-		fabs(chassis_move.joint_motor[2]->Data.Position) < ZERO_POS_THRESHOLD &&
-		fabs(chassis_move.joint_motor[3]->Data.Position) < ZERO_POS_THRESHOLD)
-	{
-		CALIBRATE.calibrated = true;
-	}
-
-	// 校准模式的相关反馈数据
-	uint32_t now = HAL_GetTick();
-	if (chassis_move.mode == CHASSIS_CALIBRATE)
-	{
-		for (uint8_t i = 0; i < 4; i++)
-		{
-			CALIBRATE.velocity[i] = chassis_move.joint_motor[i]->Data.Velocity;
-			if (CALIBRATE.velocity[i] > CALIBRATE_STOP_VELOCITY)
-			{ // 速度大于阈值时重置计时
-				CALIBRATE.reached[i] = false;
-				CALIBRATE.stop_time[i] = now;
-			}
-			else
-			{
-				if (now - CALIBRATE.stop_time[i] > CALIBRATE_STOP_TIME)
-				{
-					CALIBRATE.reached[i] = true;
-				}
-			}
-		}
-	}
-}
-
-/**
- * @brief          异常处理
- * @param[in]      none
- * @retval         none
- */
-void ChassisHandleException(void)
-{
-	if (GetRcOffline())
-	{
-		chassis_move.error_code |= DBUS_ERROR_OFFSET;
-	}
-	else
-	{
-		chassis_move.error_code &= ~DBUS_ERROR_OFFSET;
-	}
-
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		if (fabs(chassis_move.joint_motor[i]->Data.Torque) > MAX_TORQUE_PROTECT)
-		{
-			chassis_move.error_code |= JOINT_ERROR_OFFSET;
-			break;
-		}
-	}
-
-	if ((chassis_move.mode == CHASSIS_OFF || chassis_move.mode == CHASSIS_SAFE) &&
-		fabs(stand_up_pid.Param.LimitOutput) != 0.0f)
-	{
-		PID_Calc_Clear(&stand_up_pid);
-	}
-}
-
-/**
- * @brief          设置模式
- * @param[in]      none
- * @retval         none
- */
-void ChassisSetMode(void)
-{
-	if (chassis_move.error_code & DBUS_ERROR_OFFSET)
-	{ // 遥控器出错时的状态处理
-		chassis_move.mode = CHASSIS_SAFE;
-		return;
-	}
-
-	if (chassis_move.error_code & JOINT_ERROR_OFFSET)
-	{ // 关节电机出错时的状态处理
-		chassis_move.mode = CHASSIS_SAFE;
-		return;
-	}
-
-	if (chassis_move.mode == CHASSIS_CALIBRATE && (!CALIBRATE.calibrated))
-	{ // 校准完成后才退出校准
-		return;
-	}
-
-	if (CALIBRATE.toggle)
-	{ // 切入底盘校准
-		CALIBRATE.toggle = false;
-		chassis_move.mode = CHASSIS_CALIBRATE;
-		CALIBRATE.calibrated = false;
-
-		uint32_t now = HAL_GetTick();
-		for (uint8_t i = 0; i < 4; i++)
-		{
-			CALIBRATE.reached[i] = false;
-			CALIBRATE.stop_time[i] = now;
-		}
-
-		return;
-	}
-
-	if (chassis_move.recover_flag == 1) // 倒地自恢复状态
-	{
-		chassis_move.mode = CHASSIS_OFF_HOOK;
-	}
-}
-
-/**
- * @brief          计算控制量
- * @param[in]      none
- * @retval         none
- */
-void ChassisConsole(void)
-{
-	switch (chassis_move.mode)
-	{
-	case CHASSIS_CALIBRATE:
-	{
-		ConsoleCalibrate();
-	}
-	break;
-	case CHASSIS_OFF_HOOK:
-	{
-		// ConsoleOffHook();
-	}
-	break;
-	case CHASSIS_STAND_UP:
-	{
-		ConsoleStandUp();
-	}
-	break;
-	case CHASSIS_OFF:
-	case CHASSIS_SAFE:
-	default:
-	{
-		// ConsoleZeroForce();
-	}
 	}
 }

@@ -15,6 +15,7 @@
   */
 
 #include "PS2_Task.h"
+#include "Detect_Task.h"
 #include "cmsis_os.h"
 
 ps2data_t ps2data;
@@ -45,13 +46,31 @@ bool ps2_lost = true;		// ps2手柄离线标志位，初始为离线
 uint32_t last_operate_time; // 上次操作时间
 uint16_t ps2_mode;
 
-uint32_t PS2_TIME = 10; // ps2手柄任务运行周期10ms
+uint32_t vbat_low_count = 0;
 void pstwo_task(void)
 {
-	PS2_SetInit();
+	while (INS.ins_flag == 0)
+	{ // 等待惯导(INS)初始化收敛完成
+		osDelay(1);
+	}
+
+	PS2_SetInit(); // 初始化ps2手柄通信接口
+
+	// pid init
+	float Stand_Up_PID_Param[PID_PARAMETER_NUM] = {KP_CHASSIS_STAND_UP, KI_CHASSIS_STAND_UP, KD_CHASSIS_STAND_UP, 0, 0, MAX_IOUT_CHASSIS_STAND_UP, MAX_OUT_CHASSIS_STAND_UP};
+	PID_Init(&stand_up_pid, PID_POSITION, Stand_Up_PID_Param);
+
+	float dt = CHASS_FSM_TIME / 1000.0f;
 
 	while (1)
 	{
+		// 处理异常
+		ChassisHandleException();
+		// 设置底盘模式
+		ChassisSetMode();
+		// 底盘状态量
+		UpdateCalibrateStatus();
+
 		if (Data[1] != PS2_MODE_ANALOG)
 		{
 			ps2_lost = true;
@@ -63,8 +82,8 @@ void pstwo_task(void)
 		ps2data.last_rx = ps2data.rx;
 		ps2data.last_ry = ps2data.ry;
 
-		PS2_data_read(&ps2data);											  // 读数据
-		PS2_data_process(&ps2data, &chassis_move, (float)PS2_TIME / 1000.0f); // 处理数据，下发底盘控制命令
+		PS2_data_read(&ps2data);					   // 读数据
+		PS2_data_process(&ps2data, &chassis_move, dt); // 处理数据，下发底盘控制命令
 
 		// 判断数据变化
 		if (ps2data.key != ps2data.last_key || ps2data.lx != ps2data.last_lx || ps2data.ly != ps2data.last_ly || ps2data.rx != ps2data.last_rx || ps2data.ry != ps2data.last_ry)
@@ -72,7 +91,10 @@ void pstwo_task(void)
 			last_operate_time = HAL_GetTick(); // 更新上次操作时间
 		}
 
-		osDelay(PS2_TIME);
+		// 计算控制量
+		ChassisConsole();
+
+		osDelay(CHASS_FSM_TIME);
 	}
 }
 
@@ -147,37 +169,43 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 	}
 	else
 	{
-		return;
+		chassis->start_flag = 0; // 手柄处于非正常状态，强制底盘失能
 	}
-	if (data->last_key != 4 && data->key == 4 && chassis->start_flag == 0)
+	if (data->last_key != PSB_START && data->key == PSB_START && chassis->start_flag == 0) // 上电
 	{
 		// 手柄上的Start按键被按下
 		chassis->start_flag = 1;
 	}
-	else if (data->last_key != 4 && data->key == 4 && chassis->start_flag == 1)
+	else if ((data->last_key != PSB_START && data->key == PSB_START && chassis->start_flag == 1) || (vbat_low_count > VBAT_LOW_WARNING_THRESHOLD)) // 下电或者低电量保护逻辑，低电量持续一段时间后自动断电保护
 	{
 		// 手柄上的Start按键被按下
 		chassis->start_flag = 0;
 		chassis->recover_flag = 0;
+
+		vbat_low_count = 0;
 	}
-	if (chassis->recover_flag == 0 && ((chassis->myPithR < ((-3.1415926f) / 4.0f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) || (chassis->myPithR > (3.1415926f / 4.0f) && chassis->myPithR < (3.1415926f / 2.0f))))
+
+	if (vbus_low_warning && (chassis_move.start_flag == 1))
+		vbat_low_count++;
+
+	if (chassis->recover_flag == 0 && ((chassis->myPithR < ((-M_PI_4)) && chassis->myPithR > ((-M_PI_2)) || (chassis->myPithR > (M_PI_4) && chassis->myPithR < (M_PI_2)))))
 	{
 		chassis->recover_flag = 1; // 需要恢复倒地
 		chassis->leg_set = 0.08f;  // 恢复原始腿长
 	}
 
-	if (data->last_key != 1 && data->key == 1 && chassis->prejump_flag == 0 && chassis->start_flag == 1)
+	if (data->last_key != PSB_SELECT && data->key == PSB_SELECT && chassis->prejump_flag == 0 && chassis->start_flag == 1)
 	{
 		// 手柄上的select按键按一下置1
 		chassis->prejump_flag = 1; // 预跳跃标志位置1
 	}
-	else if (data->last_key != 1 && data->key == 1 && chassis->prejump_flag == 1)
+	else if (data->last_key != PSB_SELECT && data->key == PSB_SELECT && chassis->prejump_flag == 1)
 	{
 		// 手柄上的select按键再按一下清0
 		chassis->prejump_flag = 0;
 	}
 
-	if (data->last_key != 5 && data->key == 5 && chassis->prejump_flag == 1 && chassis->jump_flag == 0 && chassis->jump_flag2 == 0)
+	if (data->last_key != PSB_PAD_UP && data->key == PSB_PAD_UP && chassis->prejump_flag == 1 && chassis->jump_flag == 0 && chassis->jump_flag2 == 0)
 	{
 		// 手柄上的左侧的十字键的上按键按下，执行跳跃
 		// 只有当预跳跃标志为1且落地缓冲完成后才能开始跳跃
@@ -187,7 +215,7 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 	data->last_key = data->key;
 
-	if (chassis->start_flag == 1)
+	if (chassis->start_flag == 1)								// 使能
 	{															// 启动
 		chassis->v_set = ((float)(data->ry - 128)) * (-0.008f); // 向前推为负
 		chassis->x_set = chassis->x_set + chassis->v_set * dt;
@@ -196,10 +224,10 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 		chassis->roll_set = chassis->roll_set + ((float)(data->lx - 127)) * (-0.00007f);
 
-		mySaturate(&chassis->roll_set, -0.40f, 0.40f);
+		mySaturate(&chassis->roll_set, MIN_ROLL, MAX_ROLL);
 
 		chassis->leg_set = chassis->leg_set + ((float)(data->ly - 128)) * (-0.000016f);
-		mySaturate(&chassis->leg_set, 0.072f, 0.21f);
+		mySaturate(&chassis->leg_set, MIN_LEG_LENGTH, MAX_LEG_LENGTH);
 
 		if (fabsf(chassis->last_leg_set - chassis->leg_set) > 0.0001f)
 		{						// 遥控器设置腿长在变化
@@ -207,40 +235,30 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 			left.leg_flag = 1;
 		}
 		chassis->last_leg_set = chassis->leg_set;
+
+		if (data->key == PSB_L2)
+		{
+			chassis->roll_set = INIT_ROLL;
+		}
+		else if ((ENABLE_CHASSIS_CALIBRATE && data->key == PSB_R2) || (!chass_is_calibrated))
+		{
+			chass_is_calibrated = true; // 只校准一次，避免误触
+			CALIBRATE.toggle = true;
+		}
+		else if (data->key == PSB_L1)
+		{
+			chassis->mode = CHASSIS_STAND_UP;
+			chassis->leg_set = INIT_LEG_LENGTH;
+		}
 	}
 	else if (chassis->start_flag == 0)
-	{											// 关闭
+	{											// 失能
 		chassis->v_set = 0.0f;					// 速度清零
 		chassis->x_set = chassis->x_filter;		// 保持位置
 		chassis->turn_set = chassis->total_yaw; // 保持偏航
-		chassis->leg_set = 0.08f;				// 原始腿长
-		chassis->roll_set = -0.03f;
+		chassis->leg_set = INIT_LEG_LENGTH;		// 原始腿长
+		chassis->roll_set = INIT_ROLL;
 	}
-
-	if (data->key == 9)
-	{
-		chassis->roll_set = -0.03f;
-	}
-}
-
-void jump_key(chassis_t *chassis, ps2data_t *data)
-{
-	// if (data->key == 12)
-	// {
-	// 	if (++chassis->count_key > 10)
-	// 	{
-	// 		if (chassis->jump_flag == 0)
-	// 		{
-	// 			chassis->jump_flag = 1;
-	// 			chassis->jump_leg = chassis->leg_set;
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-	// 	chassis->count_key = 0;
-	// }
-	;
 }
 
 // 判断是否为红灯模式,0x41=模拟绿灯，0x73=模拟红灯

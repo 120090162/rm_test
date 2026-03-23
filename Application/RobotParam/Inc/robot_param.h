@@ -46,6 +46,26 @@
 #define MAX_J1_ANGLE (0.0f)  // (rad)关节角度上限
 #define MAX_J2_ANGLE (0.6f)  // (rad)关节角度上限
 #define MAX_J3_ANGLE (1.8f)  // (rad)关节角度上限
+// 遥控器控制机器人相关参数
+#define MAX_ROLL (0.3f)        // (rad)遥控器控制的最大滚转角，超过这个角度底盘不再增加滚转角以保护底盘
+#define MAX_LEG_LENGTH (0.35f) // (m)遥控器控制的最大腿长，超过这个长度底盘不再增加腿长以保护底盘
+#define MIN_ROLL (-MAX_ROLL)
+#define MIN_LEG_LENGTH (0.11f)
+
+#define INIT_LEG_LENGTH (0.12f) // (m)底盘初始腿长
+#define INIT_ROLL (-0.03f)      // (rad)底盘初始滚转角
+
+// physical parameters ---------------------
+#define LEG_L1 (0.215f) // (m)腿1长度
+#define LEG_L2 (0.258f) // (m)腿2长度
+#define LEG_L3 (LEG_L2) // (m)腿3长度
+#define LEG_L4 (LEG_L1) // (m)腿4长度
+#define LEG_L5 (0.0f)   // (m)关节间距
+
+#define BODY_MASS (8.5f)       // (kg)机身重量
+#define WHEEL_MASS (0.65f)     // (kg)轮子重量
+#define WHEEL_RADIUS (0.0625f) // (m)轮子半径
+#define WHEEL_BASE (0.51175f)  // (m)驱动轮轴距
 // DM电机初始角度与水平线的关系
 #define J0_ANGLE_OFFSET (-0.19163715f + M_PI) // (rad)关节0角度偏移量(电机0点到水平线的夹角)
 #define J1_ANGLE_OFFSET (0.19163715f)         // (rad)关节1角度偏移量(电机0点到水平线的夹角)
@@ -73,6 +93,10 @@
 #define CALIBRATE_STOP_VELOCITY 0.05f // 关节速度小于该阈值时认为已经停止, rad/s
 #define CALIBRATE_STOP_TIME 200       // 校准停止状态持续超过该时间时认为已经稳定, ms
 #define CALIBRATE_VELOCITY 2.0f       // 校准时的关节速度, rad/s
+// IMU校准相关参数
+#define TEMP_CALI_THRESHOLD 40.0f // IMU校准时温度上限
+// 电池低压保护相关参数
+#define VBAT_LOW_WARNING_THRESHOLD 100 // 电池电压计数高于该值时自动断电
 
 // 底盘错误代码定义
 #define JOINT_ERROR_OFFSET ((uint8_t)1 << 0) // 关节电机错误偏移量
@@ -86,5 +110,15 @@
 #define KD_CHASSIS_STAND_UP (10.0f)
 #define MAX_IOUT_CHASSIS_STAND_UP (0.0f)
 #define MAX_OUT_CHASSIS_STAND_UP (2000.0f)
+// 腿长跟踪长度环PID参数
+#define KP_CHASSIS_LEG_LENGTH_LENGTH (150.0f)
+#define KI_CHASSIS_LEG_LENGTH_LENGTH (0.0f)
+#define KD_CHASSIS_LEG_LENGTH_LENGTH (1500.0f)
+#define MAX_IOUT_CHASSIS_LEG_LENGTH_LENGTH (0.0f)
+#define MAX_OUT_CHASSIS_LEG_LENGTH_LENGTH (40.0f)
+#define ALPHA_LEG_LENGTH_LENGTH (0.1f)
+
+// 离地检测相关参数
+#define TAKE_OFF_FN_THRESHOLD (3.0f) // 支持力阈值，当支持力小于这个值时认为离地
 
 #endif /* ROBOT_PARAM_H */

@@ -14,6 +14,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "INS_Task.h"
+#include "robot_param.h"
 
 /**
  * @brief the structure that contains the information for the INS.
@@ -22,7 +23,7 @@ INS_t INS;
 
 struct MAHONY_FILTER_t mahony;
 Axis3f Gyro, Accel;
-float gravity[3] = {0, 0, 9.81f};
+float gravity[3] = {0, 0, GRAVITY};
 
 uint32_t INS_DWT_Count = 0;
 float ins_dt = 0.0f;
@@ -43,6 +44,8 @@ PID_Info_TypeDef TempCtrl_PID;
  * @brief Initializes the INS_Task.
  */
 static void INS_Task_Init(void);
+
+static void IMU_Param_Correction(IMU_Param_t *param, float gyro[3], float accel[3]);
 
 /**
  * @brief  Control the BMI088 temperature
@@ -85,6 +88,13 @@ void INS_task(void)
 		Gyro.x = BMI088.Gyro[AXIS_X];
 		Gyro.y = BMI088.Gyro[AXIS_Y];
 		Gyro.z = BMI088.Gyro[AXIS_Z];
+
+		// // demo function,用于修正安装误差,可以不管,本demo暂时没用
+		// IMU_Param_Correction(&IMU_Param, INS.Gyro, INS.Accel);
+
+		// // 计算重力加速度矢量和b系的XY两轴的夹角,可用作功能扩展,本demo暂时没用
+		// INS.atanxz = -atan2f(INS.Accel[AXIS_X], INS.Accel[AXIS_Z]) * 180 / PI;
+		// INS.atanyz = atan2f(INS.Accel[AXIS_Y], INS.Accel[AXIS_Z]) * 180 / PI;
 
 		mahony_input(&mahony, Gyro, Accel);
 		mahony_update(&mahony);
@@ -141,15 +151,15 @@ void INS_task(void)
 			// INS.YawTotalAngle=INS.YawTotalAngle+INS.Gyro[2]*0.001f;
 
 			// 处理 Yaw 角过零点的问题 (将 -180~180 的角度转换为连续的累计角度)
-			if (INS.Yaw - INS.YawAngleLast > 3.1415926f)
+			if (INS.Yaw - INS.YawAngleLast > M_PI)
 			{
 				INS.YawRoundCount--;
 			}
-			else if (INS.Yaw - INS.YawAngleLast < -3.1415926f)
+			else if (INS.Yaw - INS.YawAngleLast < -M_PI)
 			{
 				INS.YawRoundCount++;
 			}
-			INS.YawTotalAngle = 6.283f * INS.YawRoundCount + INS.Yaw;
+			INS.YawTotalAngle = M_2PI * INS.YawRoundCount + INS.Yaw;
 			INS.YawAngleLast = INS.Yaw;
 		}
 		else
@@ -186,7 +196,7 @@ static void INS_Task_Init(void)
  */
 static void BMI088_Temp_Control(float Temp)
 {
-	PID_Calculate(&TempCtrl_PID, 40.f, Temp);
+	PID_Calculate(&TempCtrl_PID, TEMP_CALI_THRESHOLD, Temp);
 
 	VAL_LIMIT(TempCtrl_PID.Output, -TempCtrl_PID.Param.LimitOutput, TempCtrl_PID.Param.LimitOutput);
 
@@ -234,4 +244,74 @@ void EarthFrameToBodyFrame(const float *vecEF, float *vecBF, float *q)
 	vecBF[2] = 2.0f * ((q[1] * q[3] + q[0] * q[2]) * vecEF[0] +
 					   (q[2] * q[3] - q[0] * q[1]) * vecEF[1] +
 					   (0.5f - q[1] * q[1] - q[2] * q[2]) * vecEF[2]);
+}
+
+/**
+ * @brief reserved.用于修正IMU安装误差与标度因数误差,即陀螺仪轴和云台轴的安装偏移
+ *
+ *
+ * @param param IMU参数
+ * @param gyro  角速度
+ * @param accel 加速度
+ */
+static void IMU_Param_Correction(IMU_Param_t *param, float gyro[3], float accel[3])
+{
+	static float lastYawOffset, lastPitchOffset, lastRollOffset;
+	static float c_11, c_12, c_13, c_21, c_22, c_23, c_31, c_32, c_33;
+	float cosPitch, cosYaw, cosRoll, sinPitch, sinYaw, sinRoll;
+
+	if (fabsf(param->Yaw - lastYawOffset) > 0.001f ||
+		fabsf(param->Pitch - lastPitchOffset) > 0.001f ||
+		fabsf(param->Roll - lastRollOffset) > 0.001f || param->flag)
+	{
+		cosYaw = arm_cos_f32(param->Yaw / 57.295779513f);
+		cosPitch = arm_cos_f32(param->Pitch / 57.295779513f);
+		cosRoll = arm_cos_f32(param->Roll / 57.295779513f);
+		sinYaw = arm_sin_f32(param->Yaw / 57.295779513f);
+		sinPitch = arm_sin_f32(param->Pitch / 57.295779513f);
+		sinRoll = arm_sin_f32(param->Roll / 57.295779513f);
+
+		// 1.yaw(alpha) 2.pitch(beta) 3.roll(gamma)
+		c_11 = cosYaw * cosRoll + sinYaw * sinPitch * sinRoll;
+		c_12 = cosPitch * sinYaw;
+		c_13 = cosYaw * sinRoll - cosRoll * sinYaw * sinPitch;
+		c_21 = cosYaw * sinPitch * sinRoll - cosRoll * sinYaw;
+		c_22 = cosYaw * cosPitch;
+		c_23 = -sinYaw * sinRoll - cosYaw * cosRoll * sinPitch;
+		c_31 = -cosPitch * sinRoll;
+		c_32 = sinPitch;
+		c_33 = cosPitch * cosRoll;
+		param->flag = 0;
+	}
+	float gyro_temp[3];
+	for (uint8_t i = 0; i < 3; i++)
+		gyro_temp[i] = gyro[i] * param->scale[i];
+
+	gyro[AXIS_X] = c_11 * gyro_temp[AXIS_X] +
+				   c_12 * gyro_temp[AXIS_Y] +
+				   c_13 * gyro_temp[AXIS_Z];
+	gyro[AXIS_Y] = c_21 * gyro_temp[AXIS_X] +
+				   c_22 * gyro_temp[AXIS_Y] +
+				   c_23 * gyro_temp[AXIS_Z];
+	gyro[AXIS_Z] = c_31 * gyro_temp[AXIS_X] +
+				   c_32 * gyro_temp[AXIS_Y] +
+				   c_33 * gyro_temp[AXIS_Z];
+
+	float accel_temp[3];
+	for (uint8_t i = 0; i < 3; i++)
+		accel_temp[i] = accel[i];
+
+	accel[AXIS_X] = c_11 * accel_temp[AXIS_X] +
+					c_12 * accel_temp[AXIS_Y] +
+					c_13 * accel_temp[AXIS_Z];
+	accel[AXIS_Y] = c_21 * accel_temp[AXIS_X] +
+					c_22 * accel_temp[AXIS_Y] +
+					c_23 * accel_temp[AXIS_Z];
+	accel[AXIS_Z] = c_31 * accel_temp[AXIS_X] +
+					c_32 * accel_temp[AXIS_Y] +
+					c_33 * accel_temp[AXIS_Z];
+
+	lastYawOffset = param->Yaw;
+	lastPitchOffset = param->Pitch;
+	lastRollOffset = param->Roll;
 }

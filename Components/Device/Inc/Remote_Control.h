@@ -72,6 +72,9 @@
 
 #define DT7_RC_TO_ONE 0.0015151515151515f // (1/660)遥控器通道值归一化系数
 
+#define RC_ONLINE_CNT 10U
+#define RC_OFFLINE_CNT 5U
+
 /* Exported types ------------------------------------------------------------*/
 /**
  * @brief typedef enum that contains the status of the keyboard.

@@ -15,6 +15,7 @@
 #include "BMI088Middleware.h"
 #include "bsp_dwt.h"
 #include <math.h>
+#include "robot_param.h"
 
 float BMI088_ACCEL_SEN = BMI088_ACCEL_6G_SEN;
 float BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
@@ -138,8 +139,8 @@ uint8_t BMI088_init(SPI_HandleTypeDef *bmi088_SPI, uint8_t calibrate)
         BMI088.AccelOffset[2] = AzOFFSET;
 
         BMI088.gNorm = gNORM;
-        BMI088.AccelScale = 9.81f / BMI088.gNorm;
-        BMI088.TempWhenCali = 40;
+        BMI088.AccelScale = GRAVITY / BMI088.gNorm;
+        BMI088.TempWhenCali = TEMP_CALI_THRESHOLD;
     }
 
     return error;
@@ -166,7 +167,7 @@ void Calibrate_MPU_Offset(IMU_Data_t *bmi088)
             bmi088->GyroOffset[1] = GyOFFSET;
             bmi088->GyroOffset[2] = GzOFFSET;
             bmi088->gNorm = gNORM;
-            bmi088->TempWhenCali = 40;
+            bmi088->TempWhenCali = TEMP_CALI_THRESHOLD;
             break;
         }
 
@@ -256,7 +257,7 @@ void Calibrate_MPU_Offset(IMU_Data_t *bmi088)
 
         caliCount++;
     } while (gNormDiff > 0.5f ||
-             fabsf(bmi088->gNorm - 9.8f) > 0.5f ||
+             fabsf(bmi088->gNorm - GRAVITY) > 0.5f ||
              gyroDiff[0] > 0.15f ||
              gyroDiff[1] > 0.15f ||
              gyroDiff[2] > 0.15f ||
@@ -265,7 +266,7 @@ void Calibrate_MPU_Offset(IMU_Data_t *bmi088)
              fabsf(bmi088->GyroOffset[2]) > 0.01f);
 
     // 根据标定结果校准加速度计标度因数
-    bmi088->AccelScale = 9.81f / bmi088->gNorm;
+    bmi088->AccelScale = GRAVITY / bmi088->gNorm;
 
     for (uint16_t i = 0; i < acc_CaliTimes; i++)
     {

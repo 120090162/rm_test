@@ -269,6 +269,7 @@ static void MusicPlay(void)
             if (PlayMusic(&MUSICS[vbat_low], 0.5f))
                 is_play = PLAY_NONE;
         }
+        break;
 
         default:
         {

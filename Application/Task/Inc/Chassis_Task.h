@@ -83,7 +83,15 @@ extern Calibrate_s CALIBRATE;
 
 extern PID_Info_TypeDef stand_up_pid;
 
+extern uint32_t CHASS_FSM_TIME;
+extern bool chass_is_calibrated;
+
 extern void mySaturate(float *in, float min, float max);
+
+extern void UpdateCalibrateStatus(void);
+extern void ChassisHandleException(void);
+extern void ChassisSetMode(void);
+extern void ChassisConsole(void);
 
 extern void ConsoleCalibrate(void);
 extern void ConsoleStandUp(void);

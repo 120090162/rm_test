@@ -51,13 +51,14 @@
 [整体工程性思考](https://www.robook.org/blog/dkgzzj)
 
 ## note
-x -> roll
-y -> pitch -> phi
-z -> yaw
+机器人方向定义，逆时针旋转为正
+- x -> roll, x 轴方向向前
+- y -> pitch -> phi, y轴方向向左
+- z -> yaw, z 轴方向向上
+
+达妙板子的usb口朝后放安装(CAN2口在前，CAN1口在后), 关节电机can id 设置为左前为1，左后为2，右前为3，右后为6；轮毂电机设置为左边为4，右边为5
 
 电机旋转方向逆时针为正
-
-![imu方向定义和can_id设置]()
 
 [大疆中心板](https://rm-static.djicdn.com/tem/17348/RoboMaster%20%20%E7%94%B5%E8%B0%83%E4%B8%AD%E5%BF%83%E6%9D%BF2%20%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf)
 
@@ -104,14 +105,14 @@ SELECT 键 (data->key == 1)
 十字键 - 上 (data->key == 5)
 作用：执行跳跃。当处于预跳跃状态（prejump_flag == 1）且当前未在跳跃时，按下此键会触发底层跳跃动作（jump_flag = 1）。
 
-L2 键 (data->key == 9) (根据 MASK 数组第9位推断)
+L2 键 (data->key == 9)
 作用：一键复位横滚角（Roll角）。无论处于什么姿态，按下会将期望横滚角设为默认值（-0.03f）。
 
 2. 模拟摇杆 (Joystick)
 （前提：必须在 START 键开启的状态下才有效）
 
 右摇杆 Y 轴 (data->ry)
-作用：控制底盘的前后移动速度（v_set）及位移。向上推为前进（负值），向下推为后退。
+作用：控制底盘的前后移动速度（v_set）及位移。向上推为前进，向下推为后退。
 
 右摇杆 X 轴 (data->rx)
 作用：控制底盘的偏航/转向（turn_set）。向左右打杆用于调节机器人的航向角位置。

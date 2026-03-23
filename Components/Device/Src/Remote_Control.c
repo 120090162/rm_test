@@ -2,7 +2,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "Remote_Control.h"
-#include "Config.h"
 #include "ramp.h"
 
 /* Exported variables ---------------------------------------------------------*/

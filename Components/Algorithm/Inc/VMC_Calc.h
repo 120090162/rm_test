@@ -3,13 +3,7 @@
 
 #include "main.h"
 #include "INS_Task.h"
-
-#define pi 3.1415926f
-#define LEG_PID_KP 350.0f
-#define LEG_PID_KI 0.0f // 不积分
-#define LEG_PID_KD 3000.0f
-#define LEG_PID_MAX_OUT 90.0f // 90牛
-#define LEG_PID_MAX_IOUT 0.0f
+#include "robot_param.h"
 
 typedef struct
 {
@@ -62,17 +56,19 @@ typedef struct
 
 	uint8_t first_flag;
 	uint8_t leg_flag; // 腿长完成标志
+
+	float aver[4]; // 支持力均值滤波数组
+	float aver_fn; // 支持力均值滤波结果
 } vmc_leg_t;
 
 extern void VMC_init(vmc_leg_t *vmc); // 给杆长赋值
 
-extern void VMC_calc_1_right(vmc_leg_t *vmc, INS_t *ins, float dt); // 计算theta和d_theta给lqr用，同时也计算腿长L0
-extern void VMC_calc_1_left(vmc_leg_t *vmc, INS_t *ins, float dt);
-extern void VMC_calc_2(vmc_leg_t *vmc); // 计算期望的关节输出力矩
+extern void VMC_calc_1(vmc_leg_t *vmc, float Pitch, float PithGyro, float dt); // 计算theta和d_theta给lqr用，同时也计算腿长L0
+extern void VMC_calc_2(vmc_leg_t *vmc);										   // 计算期望的关节输出力矩
 
-extern uint8_t ground_detectionR(vmc_leg_t *vmc, INS_t *ins); // 右腿离地检测
-extern uint8_t ground_detectionL(vmc_leg_t *vmc, INS_t *ins); // 左腿离地检测
+extern uint8_t ground_detection(vmc_leg_t *vmc, INS_t *ins); // 腿离地检测
 
-extern float LQR_K_calc(float *coe, float len);
+extern void LQR_Left_K_calc(float len, float k[6]);
+extern void LQR_Right_K_calc(float len, float k[6]);
 
 #endif
