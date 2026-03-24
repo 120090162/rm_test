@@ -68,6 +68,8 @@ extern void VMC_calc_2(vmc_leg_t *vmc);										   // 计算期望的关节输�
 
 extern uint8_t ground_detection(vmc_leg_t *vmc, INS_t *ins); // 腿离地检测
 
+extern void CalcPhi1AndPhi4(float phi0, float l0, float phi1_phi4[2]);
+
 extern void LQR_Left_K_calc(float len, float k[6]);
 extern void LQR_Right_K_calc(float len, float k[6]);
 

@@ -240,7 +240,7 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 		{
 			chassis->roll_set = INIT_ROLL;
 		}
-		else if ((ENABLE_CHASSIS_CALIBRATE && data->key == PSB_R2) || (!chass_is_calibrated))
+		else if ((ENABLE_CHASSIS_CALIBRATE && data->key == PSB_R2) && !chass_is_calibrated)
 		{
 			chass_is_calibrated = true; // 只校准一次，避免误触
 			CALIBRATE.toggle = true;
