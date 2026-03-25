@@ -75,10 +75,10 @@ void VMC_calc_2(vmc_leg_t *vmc) // 计算期望的关节输出力矩
 	vmc->torque_set[1] = vmc->j21 * vmc->F0 + vmc->j22 * vmc->Tp; // 得到Back电机的输出轴期望力矩，Tp为沿中心轴的力矩
 }
 
-uint8_t ground_detection(vmc_leg_t *vmc, INS_t *ins)
+uint8_t ground_detection(vmc_leg_t *vmc)
 {
 
-	vmc->FN = vmc->F0 * arm_cos_f32(vmc->theta) + vmc->Tp * arm_sin_f32(vmc->theta) / vmc->L0 + 0.6f * (ins->MotionAccel_n[2] - vmc->dd_L0 * arm_cos_f32(vmc->theta) + 2.0f * vmc->d_L0 * vmc->d_theta * arm_sin_f32(vmc->theta) + vmc->L0 * vmc->dd_theta * arm_sin_f32(vmc->theta) + vmc->L0 * vmc->d_theta * vmc->d_theta * arm_cos_f32(vmc->theta));
+	vmc->FN = vmc->F0 * arm_cos_f32(vmc->theta) + vmc->Tp * arm_sin_f32(vmc->theta) / vmc->L0 + 0.6f * (INS.MotionAccel_n[2] - vmc->dd_L0 * arm_cos_f32(vmc->theta) + 2.0f * vmc->d_L0 * vmc->d_theta * arm_sin_f32(vmc->theta) + vmc->L0 * vmc->dd_theta * arm_sin_f32(vmc->theta) + vmc->L0 * vmc->d_theta * vmc->d_theta * arm_cos_f32(vmc->theta));
 
 	vmc->aver[0] = vmc->aver[1];
 	vmc->aver[1] = vmc->aver[2];
@@ -136,15 +136,13 @@ void CalcPhi1AndPhi4(float phi0, float l0, float phi1_phi4[2])
 }
 
 // 三次多项式拟合系数
-float Left_Poly_Coefficient[6][4] = {
+float Poly_Coefficient[12][4] = {
 	{-157.0203f, 179.8485f, -85.4172f, 0.0537f},
 	{-1.0899f, 3.0072f, -6.6735f, 0.1905f},
 	{-27.7037f, 27.7682f, -9.7108f, -0.2497f},
 	{-32.3706f, 32.7508f, -12.0579f, -0.3533f},
 	{-38.5250f, 54.5544f, -30.4327f, 8.2300f},
 	{-5.2760f, 8.9537f, -5.7839f, 1.8671f},
-};
-float Right_Poly_Coefficient[6][4] = {
 	{152.7053f, -130.2649f, 28.7526f, 5.6772f},
 	{16.2673f, -16.3037f, 5.2455f, 0.1397f},
 	{-21.5602f, 27.7447f, -13.9335f, 3.1997f},
@@ -159,23 +157,21 @@ float Right_Poly_Coefficient[6][4] = {
  * @param[in] k K矩阵
  */
 // https://zhuanlan.zhihu.com/p/563048952 1.2.1
-void LQR_Left_K_calc(float len, float k[6])
+void LQR_K_calc(float len, float k[12])
 {
 	float t1 = len;
 	float t2 = len * len;
 	float t3 = len * len * len;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 12; i++)
 	{
-		k[i] = Left_Poly_Coefficient[i][0] * t3 + Left_Poly_Coefficient[i][1] * t2 + Left_Poly_Coefficient[i][2] * t1 + Left_Poly_Coefficient[i][3];
+		k[i] = Poly_Coefficient[i][0] * t3 + Poly_Coefficient[i][1] * t2 + Poly_Coefficient[i][2] * t1 + Poly_Coefficient[i][3];
 	}
 }
-void LQR_Right_K_calc(float len, float k[6])
+
+void CalcLQR(float k[12], float x[6], float T_Tp[2])
 {
-	float t1 = len;
-	float t2 = len * len;
-	float t3 = len * len * len;
-	for (int i = 0; i < 6; i++)
-	{
-		k[i] = Right_Poly_Coefficient[i][0] * t3 + Right_Poly_Coefficient[i][1] * t2 + Right_Poly_Coefficient[i][2] * t1 + Right_Poly_Coefficient[i][3];
-	}
+	T_Tp[0] = k[0] * x[0] + k[1] * x[1] + k[2] * x[2] + k[3] * x[3] + k[4] * x[4] +
+			  k[5] * x[5];
+	T_Tp[1] = k[6] * x[0] + k[7] * x[1] + k[8] * x[2] + k[9] * x[3] + k[10] * x[4] +
+			  k[11] * x[5];
 }

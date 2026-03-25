@@ -66,11 +66,11 @@ extern void VMC_init(vmc_leg_t *vmc); // 给杆长赋值
 extern void VMC_calc_1(vmc_leg_t *vmc, float Pitch, float PithGyro, float dt); // 计算theta和d_theta给lqr用，同时也计算腿长L0
 extern void VMC_calc_2(vmc_leg_t *vmc);										   // 计算期望的关节输出力矩
 
-extern uint8_t ground_detection(vmc_leg_t *vmc, INS_t *ins); // 腿离地检测
+extern uint8_t ground_detection(vmc_leg_t *vmc); // 腿离地检测
 
 extern void CalcPhi1AndPhi4(float phi0, float l0, float phi1_phi4[2]);
 
-extern void LQR_Left_K_calc(float len, float k[6]);
-extern void LQR_Right_K_calc(float len, float k[6]);
+extern void LQR_K_calc(float len, float k[12]);
+extern void CalcLQR(float k[12], float x[6], float T_Tp[2]);
 
 #endif

@@ -46,6 +46,11 @@
 #define MAX_J1_ANGLE (0.0f)  // (rad)关节角度上限
 #define MAX_J2_ANGLE (0.6f)  // (rad)关节角度上限
 #define MAX_J3_ANGLE (1.8f)  // (rad)关节角度上限
+
+#define MAX_JOINT_TORQUE (7.0f)                        // (Nm)关节最大扭矩
+#define MAX_JOINT_TORQUE_JUMP (20.0f)                  // (Nm)跳跃时的关节最大扭矩
+#define MIN_JOINT_TORQUE (-MAX_JOINT_TORQUE)           // (Nm)关节最小扭矩
+#define MIN_JOINT_TORQUE_JUMP (-MAX_JOINT_TORQUE_JUMP) // (Nm)跳跃时的关节最小扭矩
 // 遥控器控制机器人相关参数
 #define MAX_ROLL (0.3f)        // (rad)遥控器控制的最大滚转角，超过这个角度底盘不再增加滚转角以保护底盘
 #define MAX_LEG_LENGTH (0.35f) // (m)遥控器控制的最大腿长，超过这个长度底盘不再增加腿长以保护底盘
@@ -53,7 +58,7 @@
 #define MIN_LEG_LENGTH (0.11f)
 
 #define INIT_LEG_LENGTH (0.12f) // (m)底盘初始腿长
-#define INIT_ROLL (-0.03f)      // (rad)底盘初始滚转角
+#define INIT_ROLL (0.0f)        // (rad)底盘初始滚转角
 
 // physical parameters ---------------------
 #define LEG_L1 (0.215f) // (m)腿1长度
@@ -62,10 +67,7 @@
 #define LEG_L4 (LEG_L1) // (m)腿4长度
 #define LEG_L5 (0.0f)   // (m)关节间距
 
-#define BODY_MASS (8.5f)       // (kg)机身重量
-#define WHEEL_MASS (0.65f)     // (kg)轮子重量
-#define WHEEL_RADIUS (0.0625f) // (m)轮子半径
-#define WHEEL_BASE (0.51175f)  // (m)驱动轮轴距
+#define BODY_MASS (8.5f) // (kg)机身重量
 // DM电机初始角度与水平线的关系
 #define J0_ANGLE_OFFSET (-0.19163715f + M_PI) // (rad)关节0角度偏移量(电机0点到水平线的夹角)
 #define J1_ANGLE_OFFSET (0.19163715f)         // (rad)关节1角度偏移量(电机0点到水平线的夹角)
@@ -86,7 +88,8 @@
 #define WHEEL_BASE (0.51175f)  // (m)驱动轮轴距，即左右轮之间的默认距离
 
 // 机器人物理参数
-#define BODY_MASS (8.5f) // (kg)机身重量
+#define BODY_MASS (8.5f)                   // (kg)机身重量
+#define BODY_GRAVITY (BODY_MASS * GRAVITY) // (N)机身重力
 
 // 底盘校准相关参数
 #define ZERO_POS_THRESHOLD 0.001f     // 关节位置小于该阈值时认为已经校准到位
@@ -117,8 +120,34 @@
 #define MAX_IOUT_CHASSIS_LEG_LENGTH_LENGTH (0.0f)
 #define MAX_OUT_CHASSIS_LEG_LENGTH_LENGTH (40.0f)
 #define ALPHA_LEG_LENGTH_LENGTH (0.1f)
+// roll轴跟踪角度环PID参数
+#define KP_CHASSIS_ROLL_ANGLE (0.3f)
+#define KI_CHASSIS_ROLL_ANGLE (0.0f)
+#define KD_CHASSIS_ROLL_ANGLE (0.2f)
+#define MAX_IOUT_CHASSIS_ROLL_ANGLE (0.0f)
+#define MAX_OUT_CHASSIS_ROLL_ANGLE (0.1f)
+// 防劈叉补偿PID参数
+#define KP_CHASSIS_TP 30.0f
+#define KI_CHASSIS_TP 0.0f
+#define KD_CHASSIS_TP 1.0f
+#define MAX_IOUT_CHASSIS_TP 0.0f
+#define MAX_OUT_CHASSIS_TP 2.0f
+// 偏航角补偿PID参数
+#define KP_CHASSIS_TURN 2.5f
+#define KI_CHASSIS_TURN 0.0f
+#define KD_CHASSIS_TURN 0.3f
+#define MAX_IOUT_CHASSIS_TURN 0.0f
+#define MAX_OUT_CHASSIS_TURN 2.41f // 轮毂电机的额定扭矩(这里是翎控电机的额定扭矩)
 
 // 离地检测相关参数
 #define TAKE_OFF_FN_THRESHOLD (3.0f) // 支持力阈值，当支持力小于这个值时认为离地
+
+// offest parameters ---------------------
+#define X0_OFFSET (0.0f) // 目标theta偏移量
+#define X1_OFFSET (0.0f) // 目标theta_dot偏移量
+#define X2_OFFSET (0.0f) // 目标x偏移量
+#define X3_OFFSET (0.0f) // 目标x_dot偏移量
+#define X4_OFFSET (0.0f) // 目标phi偏移量
+#define X5_OFFSET (0.0f) // 目标phi_dot偏移量
 
 #endif /* ROBOT_PARAM_H */

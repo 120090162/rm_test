@@ -16,6 +16,7 @@
 
 #include "PS2_Task.h"
 #include "Detect_Task.h"
+#include "User_Lib.h"
 #include "cmsis_os.h"
 
 ps2data_t ps2data;
@@ -47,6 +48,8 @@ uint32_t last_operate_time; // 上次操作时间
 uint16_t ps2_mode;
 
 uint32_t vbat_low_count = 0;
+
+uint32_t PS2_TIME = 10; // ps2手柄任务周期是10ms
 void pstwo_task(void)
 {
 	while (INS.ins_flag == 0)
@@ -56,21 +59,10 @@ void pstwo_task(void)
 
 	PS2_SetInit(); // 初始化ps2手柄通信接口
 
-	// pid init
-	float Stand_Up_PID_Param[PID_PARAMETER_NUM] = {KP_CHASSIS_STAND_UP, KI_CHASSIS_STAND_UP, KD_CHASSIS_STAND_UP, 0, 0, MAX_IOUT_CHASSIS_STAND_UP, MAX_OUT_CHASSIS_STAND_UP};
-	PID_Init(&stand_up_pid, PID_POSITION, Stand_Up_PID_Param);
-
-	float dt = CHASS_FSM_TIME / 1000.0f;
+	float dt = (float)(PS2_TIME) / 1000.0f;
 
 	while (1)
 	{
-		// 处理异常
-		ChassisHandleException();
-		// 设置底盘模式
-		ChassisSetMode();
-		// 底盘状态量
-		UpdateCalibrateStatus();
-
 		if (Data[1] != PS2_MODE_ANALOG)
 		{
 			ps2_lost = true;
@@ -91,10 +83,7 @@ void pstwo_task(void)
 			last_operate_time = HAL_GetTick(); // 更新上次操作时间
 		}
 
-		// 计算控制量
-		ChassisConsole();
-
-		osDelay(CHASS_FSM_TIME);
+		osDelay(PS2_TIME);
 	}
 }
 
@@ -190,8 +179,8 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 	if (chassis->recover_flag == 0 && ((chassis->myPithR < ((-M_PI_4)) && chassis->myPithR > ((-M_PI_2)) || (chassis->myPithR > (M_PI_4) && chassis->myPithR < (M_PI_2)))))
 	{
-		chassis->recover_flag = 1; // 需要恢复倒地
-		chassis->leg_set = 0.08f;  // 恢复原始腿长
+		chassis->recover_flag = 1;			// 需要恢复倒地
+		chassis->leg_set = INIT_LEG_LENGTH; // 恢复原始腿长
 	}
 
 	if (data->last_key != PSB_SELECT && data->key == PSB_SELECT && chassis->prejump_flag == 0 && chassis->start_flag == 1)
@@ -215,14 +204,17 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 	data->last_key = data->key;
 
-	if (chassis->start_flag == 1)								// 使能
-	{															// 启动
-		chassis->v_set = ((float)(data->ry - 128)) * (-0.008f); // 向前推为负
+	if (chassis->start_flag == 1)									  // 使能
+	{																  // 启动
+		chassis->target_v = ((float)(data->ry - 128)) * (-0.008f);	  // 往前大于0
+		slope_following(&chassis->target_v, &chassis->v_set, 0.005f); //	坡度跟随
+
 		chassis->x_set = chassis->x_set + chassis->v_set * dt;
 
 		chassis->turn_set = chassis->turn_set + (data->rx - 127) * (-0.0005f); // 向右打为正
 
-		chassis->roll_set = chassis->roll_set + ((float)(data->lx - 127)) * (-0.00007f);
+		chassis->roll_target = chassis->roll_set + ((float)(data->lx - 127)) * (-0.00007f);
+		slope_following(&chassis->roll_target, &chassis->roll_set, 0.0075f);
 
 		mySaturate(&chassis->roll_set, MIN_ROLL, MAX_ROLL);
 

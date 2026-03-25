@@ -7,6 +7,7 @@
 #include "Motor.h"
 #include "robot_param.h"
 #include "VMC_Calc.h"
+#include "User_Lib.h"
 
 typedef enum
 {
@@ -26,14 +27,16 @@ typedef struct
 	ChassisMode_e mode; // 底盘模式
 	uint8_t error_code; // 底盘错误代码
 
-	float v_set; // 期望速度，单位是m/s
-	float x_set; // 期望位置，单位是m
+	float v_set;	// 一阶滤波后的期望速度，单位是m/s
+	float target_v; // 遥控器控制的期望速度，单位是m/s
+	float x_set;	// 期望位置，单位是m
 
-	float turn_set; // 期望yaw轴弧度
-	float roll_set; // 期望roll轴弧度
-	float roll_x;
-	float phi_set;
-	float theta_set;
+	float turn_set;	   // 期望yaw轴弧度
+	float roll_set;	   // 一阶滤波后的期望roll轴弧度
+	float roll_target; // 遥控器控制的期望roll轴弧度
+	// float roll_x;
+	// float phi_set;
+	// float theta_set;
 
 	float leg_set; // 期望腿长，单位是m
 	float last_leg_set;
@@ -77,11 +80,23 @@ extern chassis_t chassis_move;
 extern vmc_leg_t left;
 extern vmc_leg_t right;
 
+extern uint8_t left_flag;
+extern uint8_t right_flag;
+
+extern uint32_t jump_time_r;
+extern uint32_t jump_time_l;
+
 extern uint32_t CHASS_TIME;
 
 extern Calibrate_s CALIBRATE;
 
 extern PID_Info_TypeDef stand_up_pid;
+extern PID_Info_TypeDef legl_pid;
+extern PID_Info_TypeDef legr_pid;
+
+extern PID_Info_TypeDef roll_pid;
+extern PID_Info_TypeDef tp_pid;
+extern PID_Info_TypeDef turn_pid;
 
 extern uint32_t CHASS_FSM_TIME;
 extern bool chass_is_calibrated;

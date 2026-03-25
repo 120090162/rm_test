@@ -138,4 +138,6 @@ extern float OLS_Smooth(Ordinary_Least_Squares_t *OLS, float deltax, float y);
 extern float Get_OLS_Derivative(Ordinary_Least_Squares_t *OLS);
 extern float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS);
 
+extern void slope_following(float *target, float *set, float acc);
+
 #endif

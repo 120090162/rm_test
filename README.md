@@ -1,4 +1,4 @@
-# rm_test
+# rm_test v0.1
 这是过岗龙战队2026赛季平衡步兵的达妙mc02开发板的源码测试，代码参考[`link`](https://gitee.com/SMBU-POLARBEAR/StandardRobotpp)。具体板子设置参考[`user_guide.pdf`](doc/user_guide.pdf)。
 
 # reference
@@ -50,6 +50,8 @@
 
 [整体工程性思考](https://www.robook.org/blog/dkgzzj)
 
+VMC 倒立摆建模的 phi1 对应前面的关节, phi4 对应后面的关节
+
 ## note
 机器人方向定义，逆时针旋转为正
 - x -> roll, x 轴方向向前
@@ -74,6 +76,8 @@
 // matlab R2024a
 // add ons: Symbolic Math Toolbox
 ```
+
+仿真也可以参考 [轮足仿真](https://github.com/ziyuliu66/Wheel-legged-robot-MATLAB-simulation-collection.git)
 
 因为开启了D-Cache，dma使用的时候需要声明缓存的储存位置，详细说明见 `main.c`
 

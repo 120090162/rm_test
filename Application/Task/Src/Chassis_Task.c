@@ -1,7 +1,6 @@
 #include "Remote_Task.h"
 #include "PS2_Task.h"
 #include "Chassis_Task.h"
-#include "User_Lib.h"
 
 chassis_t chassis_move = {
     .mode = CHASSIS_OFF,
@@ -9,6 +8,12 @@ chassis_t chassis_move = {
 };
 vmc_leg_t left;
 vmc_leg_t right;
+
+uint8_t left_flag;
+uint8_t right_flag;
+
+uint32_t jump_time_r;
+uint32_t jump_time_l;
 
 uint32_t CHASS_TIME = 1;
 bool chass_is_calibrated = false;
@@ -21,6 +26,12 @@ Calibrate_s CALIBRATE = {
 };
 
 PID_Info_TypeDef stand_up_pid;
+PID_Info_TypeDef legl_pid;
+PID_Info_TypeDef legr_pid;
+
+PID_Info_TypeDef roll_pid;
+PID_Info_TypeDef tp_pid;
+PID_Info_TypeDef turn_pid;
 
 uint32_t CHASS_FSM_TIME = 3; // 3ms的底盘控制周期，对齐底盘控制频率
 
@@ -202,8 +213,8 @@ void ConsoleStandUp(void)
 {
     // ===腿部位置控制===
     float phi1_phi4_l[2], phi1_phi4_r[2];
-    CalcPhi1AndPhi4(CHASSIS.ref.rod_Angle[0], CHASSIS.ref.rod_L0[0], phi1_phi4_l);
-    CalcPhi1AndPhi4(CHASSIS.ref.rod_Angle[1], CHASSIS.ref.rod_L0[1], phi1_phi4_r);
+    CalcPhi1AndPhi4(M_PI_2, chassis_move.leg_set, phi1_phi4_l);
+    CalcPhi1AndPhi4(M_PI_2, chassis_move.leg_set, phi1_phi4_r);
 
     // 当解算出的角度正常时，设置目标角度
     if (!(isnan(phi1_phi4_l[0]) || isnan(phi1_phi4_l[1]) || isnan(phi1_phi4_r[0]) ||
@@ -230,7 +241,7 @@ void ConsoleStandUp(void)
 
     // ===驱动轮pid控制===
     float feedforward = -220;
-    PID_Calculate(&stand_up_pid, 0, INS.Pitch);
+    PID_Calculate(&stand_up_pid, 0, INS.Pitch); // 以IMU Pitch角为反馈，0为目标，计算站起pid控制量
     left.wheel_T = (feedforward + stand_up_pid.Output) * W0_DIRECTION;
     right.wheel_T = (feedforward + stand_up_pid.Output) * W1_DIRECTION;
 }

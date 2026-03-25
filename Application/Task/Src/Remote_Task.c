@@ -5,6 +5,8 @@
 
 #include "robot_param.h"
 
+uint32_t REMOTE_TIME = 10; // rc手柄任务周期是10ms
+
 void Remote_task(void)
 {
 	while (INS.ins_flag == 0)
@@ -16,7 +18,7 @@ void Remote_task(void)
 	float Stand_Up_PID_Param[PID_PARAMETER_NUM] = {KP_CHASSIS_STAND_UP, KI_CHASSIS_STAND_UP, KD_CHASSIS_STAND_UP, 0, 0, MAX_IOUT_CHASSIS_STAND_UP, MAX_OUT_CHASSIS_STAND_UP};
 	PID_Init(&stand_up_pid, PID_POSITION, Stand_Up_PID_Param);
 
-	float dt = CHASS_FSM_TIME / 1000.0f;
+	float dt = (float)(REMOTE_TIME) / 1000.0f;
 	static float last_jump_vrb = 0;
 	static uint32_t vbat_low_count = 0;
 
@@ -175,6 +177,6 @@ void Remote_task(void)
 		// 计算控制量
 		ChassisConsole();
 
-		osDelay(CHASS_FSM_TIME);
+		osDelay(REMOTE_TIME);
 	}
 }
