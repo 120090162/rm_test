@@ -65,7 +65,7 @@ void ChassisR_task(void)
                 osDelay(CHASS_TIME);
                 DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], 0, 0, 0, ZERO_FORCE_VEL_KD, 0);
                 osDelay(CHASS_TIME);
-                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, 1);
+                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, 0);
                 osDelay(CHASS_TIME);
             }
             }
