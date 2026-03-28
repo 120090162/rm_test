@@ -99,6 +99,12 @@ void ChassisL_init(void)
         LK_Motor_Command(&FDCAN3_TxFrame, chassis_move.wheel_motor[0], LK_Motor_Enable); // 左边轮毂电机
         osDelay(1);
     }
+
+    // // 保存零点位置
+    // DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[0], DM_Motor_Save_Zero_Position);
+    // osDelay(10);
+    // DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[1], DM_Motor_Save_Zero_Position);
+    // osDelay(10);
 }
 
 void ChassisL_feedback_update(void)

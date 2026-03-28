@@ -79,6 +79,10 @@ VMC 倒立摆建模的 phi1 对应前面的关节, phi4 对应后面的关节
 
 仿真也可以参考 [轮足仿真](https://github.com/ziyuliu66/Wheel-legged-robot-MATLAB-simulation-collection.git)
 
+达妙轮足拓展[链接](https://github.com/cyiyang/serial-wheel-leg)
+
+达妙建模[解析](https://blog.csdn.net/Kevin3389179304/article/details/148379498)
+
 因为开启了D-Cache，dma使用的时候需要声明缓存的储存位置，详细说明见 `main.c`
 
 ## trouble
@@ -115,8 +119,11 @@ L2 键 (data->key == 9)
 R2 键
 作用：底盘关节电机零点标定
 
-L1 键盘
+L1 键
 作用：位控制站起来
+
+R1 键
+作用：播放音乐
 
 2. 模拟摇杆 (Joystick)
 （前提：必须在 START 键开启的状态下才有效）

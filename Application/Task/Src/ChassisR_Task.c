@@ -115,6 +115,12 @@ void ChassisR_init(void)
         LK_Motor_Command(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], LK_Motor_Enable); // 右边轮毂电机
         osDelay(1);
     }
+
+    // // 保存零点位置
+    // DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[2], DM_Motor_Save_Zero_Position);
+    // osDelay(10);
+    // DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[3], DM_Motor_Save_Zero_Position);
+    // osDelay(10);
 }
 
 void Pensation_init(void)
