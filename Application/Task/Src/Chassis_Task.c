@@ -197,10 +197,10 @@ void ChassisConsole(void)
  */
 void ConsoleCalibrate(void)
 {
-    left.velocity_set[0] = -CALIBRATE_VELOCITY;
-    left.velocity_set[1] = CALIBRATE_VELOCITY;
-    right.velocity_set[0] = CALIBRATE_VELOCITY;
-    right.velocity_set[1] = -CALIBRATE_VELOCITY;
+    left.velocity_set[1] = -CALIBRATE_VELOCITY;
+    left.velocity_set[0] = CALIBRATE_VELOCITY;
+    right.velocity_set[1] = CALIBRATE_VELOCITY;
+    right.velocity_set[0] = -CALIBRATE_VELOCITY;
 
     left.wheel_T = 0;
     right.wheel_T = 0;

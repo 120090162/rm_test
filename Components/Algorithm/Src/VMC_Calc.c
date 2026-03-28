@@ -107,32 +107,43 @@ uint8_t ground_detection(vmc_leg_t *vmc)
  */
 void CalcPhi1AndPhi4(float phi0, float l0, float phi1_phi4[2])
 {
-	float L5_2_pow;
-	float Lca2, Lce2;
-	float cos_phi11, cos_phi12, cos_phi41, cos_phi42;
-	float phi11, phi12, phi41, phi42;
-	float phi1, phi4;
+	// float L5_2_pow;
+	// float Lca2, Lce2;
+	// float cos_phi11, cos_phi12, cos_phi41, cos_phi42;
+	// float phi11, phi12, phi41, phi42;
+	// float phi1, phi4;
 
-	L5_2_pow = (LEG_L5 / 2) * (LEG_L5 / 2); //(LEG_L5 / 2)^2
-	Lca2 = l0 * l0 + L5_2_pow + l0 * LEG_L5 * cos(phi0);
-	Lce2 = l0 * l0 + L5_2_pow - l0 * LEG_L5 * cos(phi0);
+	// L5_2_pow = (LEG_L5 / 2) * (LEG_L5 / 2); //(LEG_L5 / 2)^2
+	// Lca2 = l0 * l0 + L5_2_pow + l0 * LEG_L5 * cos(phi0);
+	// Lce2 = l0 * l0 + L5_2_pow - l0 * LEG_L5 * cos(phi0);
 
-	cos_phi11 = (L5_2_pow + Lca2 - l0 * l0) / (LEG_L5 * sqrt(Lca2));
-	cos_phi12 = (LEG_L1 * LEG_L1 + Lca2 - LEG_L2 * LEG_L2) / (2 * LEG_L1 * sqrt(Lca2));
-	cos_phi41 = (L5_2_pow + Lce2 - l0 * l0) / (LEG_L5 * sqrt(Lce2));
-	cos_phi42 = (LEG_L4 * LEG_L4 + Lce2 - LEG_L3 * LEG_L3) / (2 * LEG_L5 * sqrt(Lce2));
+	// cos_phi11 = (L5_2_pow + Lca2 - l0 * l0) / (LEG_L5 * sqrt(Lca2));
+	// cos_phi12 = (LEG_L1 * LEG_L1 + Lca2 - LEG_L2 * LEG_L2) / (2 * LEG_L1 * sqrt(Lca2));
+	// cos_phi41 = (L5_2_pow + Lce2 - l0 * l0) / (LEG_L5 * sqrt(Lce2));
+	// cos_phi42 = (LEG_L4 * LEG_L4 + Lce2 - LEG_L3 * LEG_L3) / (2 * LEG_L5 * sqrt(Lce2));
 
-	phi11 = acos(cos_phi11);
-	phi12 = acos(cos_phi12);
+	// phi11 = acos(cos_phi11);
+	// phi12 = acos(cos_phi12);
 
-	phi41 = acos(cos_phi41);
-	phi42 = acos(cos_phi42);
+	// phi41 = acos(cos_phi41);
+	// phi42 = acos(cos_phi42);
 
-	phi1 = phi11 + phi12;
-	phi4 = M_PI - (phi41 + phi42);
+	// phi1 = phi11 + phi12;
+	// phi4 = M_PI - (phi41 + phi42);
 
-	phi1_phi4[0] = phi1;
-	phi1_phi4[1] = phi4;
+	// phi1_phi4[0] = phi1;
+	// phi1_phi4[1] = phi4;
+
+	// 下述是LEG_L5为0时的简化版本
+	float cos_beta1, cos_beta2;
+	float beta1, beta2;
+
+	cos_beta1 = (LEG_L1 * LEG_L1 + l0 * l0 - LEG_L2 * LEG_L2) / (2 * LEG_L1 * l0);
+	cos_beta2 = (LEG_L4 * LEG_L4 + l0 * l0 - LEG_L3 * LEG_L3) / (2 * LEG_L4 * l0);
+	beta1 = acos(cos_beta1);
+	beta2 = acos(cos_beta2);
+	phi1_phi4[0] = phi0 + beta1; // phi1
+	phi1_phi4[1] = phi0 - beta2; // phi4
 }
 
 // 三次多项式拟合系数
