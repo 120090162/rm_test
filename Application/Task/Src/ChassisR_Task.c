@@ -19,9 +19,9 @@ void ChassisR_task(void)
         // 底盘状态量
         UpdateCalibrateStatus();
 
-        ChassisR_feedback_update(); // 更新数据
+        // ChassisR_feedback_update(); // 更新数据
 
-        ChassisR_control_loop(); // 控制计算
+        // ChassisR_control_loop(); // 控制计算
 
         // 计算控制量
         ChassisConsole();
@@ -32,9 +32,11 @@ void ChassisR_task(void)
             {
             case CHASSIS_STAND_UP:
             {
-                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[2], right.position_set[0], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                // DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[2], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[2], right.position_set[0], 0, DEBUG_POS_KP, DEBUG_POS_KD, 0);
                 osDelay(CHASS_TIME);
-                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], right.position_set[1], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                // DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], right.position_set[1], 0, DEBUG_POS_KP, DEBUG_POS_KD, 0);
                 osDelay(CHASS_TIME);
                 LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, right.wheel_T);
                 osDelay(CHASS_TIME);
@@ -49,11 +51,14 @@ void ChassisR_task(void)
                 LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, right.wheel_T);
                 osDelay(CHASS_TIME);
 
-                if (CALIBRATE.reached[2] && CALIBRATE.reached[3])
+                if (CALIBRATE.reached[2] && CALIBRATE.reached[3] && !CALIBRATE.right_reached)
                 {
+                    CALIBRATE.right_reached = true; // 只校准一次，避免误触
                     DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[2], DM_Motor_Save_Zero_Position);
+                    DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[2], DM_Motor_Enable);
                     osDelay(CHASS_TIME);
                     DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[3], DM_Motor_Save_Zero_Position);
+                    DM_Motor_Command(&FDCAN3_TxFrame, chassis_move.joint_motor[3], DM_Motor_Enable);
                     osDelay(CHASS_TIME * 2);
                 }
             }
@@ -65,7 +70,7 @@ void ChassisR_task(void)
                 osDelay(CHASS_TIME);
                 DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[3], 0, 0, 0, ZERO_FORCE_VEL_KD, 0);
                 osDelay(CHASS_TIME);
-                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, 0);
+                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[1], 0, 1);
                 osDelay(CHASS_TIME);
             }
             }

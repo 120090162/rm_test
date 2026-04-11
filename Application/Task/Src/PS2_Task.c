@@ -43,7 +43,8 @@ uint16_t MASK[] = {
 	PSB_PINK,
 }; // 按键值屏蔽掩码
 
-bool ps2_lost = true;		// ps2手柄离线标志位，初始为离线
+bool ps2_lost = false;		// ps2手柄离线标志位，初始为离线
+// bool ps2_lost = true;		// ps2手柄离线标志位，初始为离线
 uint32_t last_operate_time; // 上次操作时间
 uint16_t ps2_mode;
 
@@ -65,7 +66,7 @@ void pstwo_task(void)
 	{
 		if (Data[1] != PS2_MODE_ANALOG)
 		{
-			ps2_lost = true;
+			// ps2_lost = true;
 			PS2_SetInit();
 		}
 
@@ -76,12 +77,6 @@ void pstwo_task(void)
 
 		PS2_data_read(&ps2data);					   // 读数据
 		PS2_data_process(&ps2data, &chassis_move, dt); // 处理数据，下发底盘控制命令
-
-		// 判断数据变化
-		if (ps2data.key != ps2data.last_key || ps2data.lx != ps2data.last_lx || ps2data.ly != ps2data.last_ly || ps2data.rx != ps2data.last_rx || ps2data.ry != ps2data.last_ry)
-		{
-			last_operate_time = HAL_GetTick(); // 更新上次操作时间
-		}
 
 		osDelay(PS2_TIME);
 	}
@@ -152,18 +147,19 @@ void PS2_data_read(ps2data_t *data)
 
 void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 {
-	if (Data[1] == PS2_MODE_ANALOG)
-	{
-		ps2_lost = false;
-	}
-	else
-	{
-		chassis->start_flag = 0; // 手柄处于非正常状态，强制底盘失能
-	}
+	// if (Data[1] == PS2_MODE_ANALOG)
+	// {
+	// 	ps2_lost = false;
+	// }
+	// else
+	// {
+	// 	chassis->start_flag = 0; // 手柄处于非正常状态，强制底盘失能
+	// }
 	if (data->last_key != PSB_START && data->key == PSB_START && chassis->start_flag == 0) // 上电
 	{
 		// 手柄上的Start按键被按下
 		chassis->start_flag = 1;
+		chassis->mode = CHASSIS_SAFE; // 先进入安全状态，等待后续条件满足才切换到其他状态
 	}
 	else if ((data->last_key != PSB_START && data->key == PSB_START && chassis->start_flag == 1) || (vbat_low_count > VBAT_LOW_WARNING_THRESHOLD)) // 下电或者低电量保护逻辑，低电量持续一段时间后自动断电保护
 	{
@@ -202,6 +198,12 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 		chassis->jump_flag2 = 1;
 	}
 
+	// 判断数据变化
+	if (ps2data.key != ps2data.last_key || ps2data.lx != ps2data.last_lx || ps2data.ly != ps2data.last_ly || ps2data.rx != ps2data.last_rx || ps2data.ry != ps2data.last_ry)
+	{
+		last_operate_time = HAL_GetTick(); // 更新上次操作时间
+	}
+
 	data->last_key = data->key;
 
 	if (chassis->start_flag == 1)									  // 使能
@@ -218,20 +220,22 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 
 		mySaturate(&chassis->roll_set, MIN_ROLL, MAX_ROLL);
 
-		chassis->leg_set = chassis->leg_set + ((float)(data->ly - 128)) * (-0.000016f);
+		chassis->leg_set = chassis->leg_set;
+		// chassis->leg_set = chassis->leg_set + ((float)(data->ly - 128)) * (-0.000016f);
 		mySaturate(&chassis->leg_set, MIN_LEG_LENGTH, MAX_LEG_LENGTH);
 
-		if (fabsf(chassis->last_leg_set - chassis->leg_set) > 0.0001f)
-		{						// 遥控器设置腿长在变化
-			right.leg_flag = 1; // 为1标志位遥控器正在控制腿长，此时不进行离地检测，因为在腿长瞬间变短时离地检测会误判为离地
-			left.leg_flag = 1;
-		}
+		// if (fabsf(chassis->last_leg_set - chassis->leg_set) > 0.0001f)
+		// {						// 遥控器设置腿长在变化
+		// 	right.leg_flag = 1; // 为1标志位遥控器正在控制腿长，此时不进行离地检测，因为在腿长瞬间变短时离地检测会误判为离地
+		// 	left.leg_flag = 1;
+		// }
 		chassis->last_leg_set = chassis->leg_set;
 
 		if (data->key == PSB_L2)
 		{
 			chassis->roll_set = INIT_ROLL;
 		}
+		// else if (ENABLE_CHASSIS_CALIBRATE && data->key == PSB_R2)
 		else if ((ENABLE_CHASSIS_CALIBRATE && data->key == PSB_R2) && !chass_is_calibrated)
 		{
 			chass_is_calibrated = true; // 只校准一次，避免误触
@@ -245,6 +249,8 @@ void PS2_data_process(ps2data_t *data, chassis_t *chassis, float dt)
 	}
 	else if (chassis->start_flag == 0)
 	{											// 失能
+		chassis->mode = CHASSIS_OFF;					// 进入底盘关闭模式
+
 		chassis->v_set = 0.0f;					// 速度清零
 		chassis->x_set = chassis->x_filter;		// 保持位置
 		chassis->turn_set = chassis->total_yaw; // 保持偏航

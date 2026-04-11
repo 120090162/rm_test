@@ -83,6 +83,8 @@ VMC 倒立摆建模的 phi1 对应前面的关节, phi4 对应后面的关节
 
 达妙建模[解析](https://blog.csdn.net/Kevin3389179304/article/details/148379498)
 
+右边前面电机对应phi1，后面电机对应phi4；左边后面电机对应phi1，左边前面电机对应phi4
+
 因为开启了D-Cache，dma使用的时候需要声明缓存的储存位置，详细说明见 `main.c`
 
 ## trouble

@@ -37,6 +37,8 @@
 #define ZERO_FORCE_VEL_KD (4.0f) // 无力MIT速度控制KD
 #define NORMAL_POS_KP (20.0f)    // 正常MIT位置控制KP
 #define NORMAL_POS_KD (1.0f)     // 正常MIT位置控制KD
+#define DEBUG_POS_KP (8.0f)    // 调试MIT位置控制KP
+#define DEBUG_POS_KD (0.8f)     // 调试MIT位置控制KD
 // DM电机限位
 #define MIN_J0_ANGLE (-0.6f) // (rad)关节角度下限
 #define MIN_J1_ANGLE (-1.8f) // (rad)关节角度下限
@@ -69,13 +71,13 @@
 
 #define BODY_MASS (8.5f) // (kg)机身重量
 // DM电机初始角度与水平线的关系
-#define J0_ANGLE_OFFSET (-0.19163715f + M_PI) // (rad)关节0角度偏移量(电机0点到水平线的夹角)
-#define J1_ANGLE_OFFSET (0.19163715f)         // (rad)关节1角度偏移量(电机0点到水平线的夹角)
+#define J0_ANGLE_OFFSET (-0.19163715f) // (rad)关节0角度偏移量(电机0点到水平线的夹角)
+#define J1_ANGLE_OFFSET (0.19163715f + M_PI)         // (rad)关节1角度偏移量(电机0点到水平线的夹角)
 #define J2_ANGLE_OFFSET (0.19163715f + M_PI)  // (rad)关节2角度偏移量(电机0点到水平线的夹角)
 #define J3_ANGLE_OFFSET (-0.19163715f)        // (rad)关节3角度偏移量(电机0点到水平线的夹角)
 // 电机旋转方向定义
-#define J0_DIRECTION (-1)
-#define J1_DIRECTION (-1)
+#define J0_DIRECTION (1)
+#define J1_DIRECTION (1)
 #define J2_DIRECTION (1)
 #define J3_DIRECTION (1)
 

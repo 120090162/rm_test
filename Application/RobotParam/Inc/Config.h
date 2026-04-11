@@ -157,6 +157,6 @@
 #define ENABLE_ALARM_VBAT_LOW false
 
 // 是否启用底盘校准功能
-#define ENABLE_CHASSIS_CALIBRATE true
+#define ENABLE_CHASSIS_CALIBRATE false
 
 #endif // ROBOT_CONFIG_H

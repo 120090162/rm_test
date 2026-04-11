@@ -22,6 +22,8 @@ Calibrate_s CALIBRATE = {
     .velocity = {0.0f, 0.0f, 0.0f, 0.0f},
     .stop_time = {0, 0, 0, 0},
     .reached = {false, false, false, false},
+    .left_reached = false,
+    .right_reached = false,
     .calibrated = false,
 };
 
@@ -132,9 +134,14 @@ void ChassisSetMode(void)
         return;
     }
 
-    if (chassis_move.mode == CHASSIS_CALIBRATE && (!CALIBRATE.calibrated))
+    if (chassis_move.mode == CHASSIS_CALIBRATE)
     { // 校准完成后才退出校准
-        return;
+        if (CALIBRATE.left_reached && CALIBRATE.right_reached && CALIBRATE.calibrated)
+        {
+            chassis_move.mode = CHASSIS_SAFE;
+        }else{
+            return; // 校准未完成前不允许切出校准模式
+        }
     }
 
     if (CALIBRATE.toggle)
@@ -225,19 +232,26 @@ void ConsoleStandUp(void)
         left.position_set[1] =
             theta_transform(phi1_phi4_l[0], -J1_ANGLE_OFFSET, J1_DIRECTION, 1);
         right.position_set[0] =
-            theta_transform(phi1_phi4_r[1], -J2_ANGLE_OFFSET, J2_DIRECTION, 1);
+            theta_transform(phi1_phi4_r[0], -J2_ANGLE_OFFSET, J2_DIRECTION, 1);
         right.position_set[1] =
-            theta_transform(phi1_phi4_r[0], -J3_ANGLE_OFFSET, J3_DIRECTION, 1);
+            theta_transform(phi1_phi4_r[1], -J3_ANGLE_OFFSET, J3_DIRECTION, 1);
     }
+
+    left.wheel_T = 0;
+    right.wheel_T = 0;
+
+    // right.position_set[0] = -0.4223f; // 站立时的固定角度，暂时先写死
+    // right.position_set[1] = 0.4223f;  // 站立时的固定角度，暂时先写死
+
     // 检测设定角度是否超过电机角度限制
-    left.position_set[0] =
-        fp32_constrain(left.position_set[0], MIN_J0_ANGLE, MAX_J0_ANGLE);
-    left.position_set[1] =
-        fp32_constrain(left.position_set[1], MIN_J1_ANGLE, MAX_J1_ANGLE);
-    right.position_set[0] =
-        fp32_constrain(right.position_set[0], MIN_J2_ANGLE, MAX_J2_ANGLE);
-    right.position_set[1] =
-        fp32_constrain(right.position_set[1], MIN_J3_ANGLE, MAX_J3_ANGLE);
+    // left.position_set[0] =
+    //     fp32_constrain(left.position_set[0], MIN_J0_ANGLE, MAX_J0_ANGLE);
+    // left.position_set[1] =
+    //     fp32_constrain(left.position_set[1], MIN_J1_ANGLE, MAX_J1_ANGLE);
+    // right.position_set[0] =
+    //     fp32_constrain(right.position_set[0], MIN_J2_ANGLE, MAX_J2_ANGLE);
+    // right.position_set[1] =
+    //     fp32_constrain(right.position_set[1], MIN_J3_ANGLE, MAX_J3_ANGLE);
 
     // ===驱动轮pid控制===
     float feedforward = -220;

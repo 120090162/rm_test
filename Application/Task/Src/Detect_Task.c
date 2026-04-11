@@ -69,7 +69,8 @@ void Detect_Task(void)
         {
             if (GetPs2IdleTime() > PS2_IDLE_TIMEOUT)
             {
-                ps2_lost = true; // ps2手柄离线
+                ps2_lost = false; // ps2手柄离线
+                // ps2_lost = true; // ps2手柄离线
             }
         }
 

@@ -72,6 +72,11 @@ typedef struct Calibrate
 	float velocity[4];	   // 关节电机速度
 	uint32_t stop_time[4]; // 停止时间
 	bool reached[4];	   // 是否到达限位
+
+	bool left_reached;  // 左边是否完成校准
+	bool right_reached; // 右边是否完成校准
+
+
 	bool calibrated;	   // 完成校准
 	bool toggle;		   // 切换校准状态
 } Calibrate_s;
