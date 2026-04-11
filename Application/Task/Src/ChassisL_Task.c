@@ -20,11 +20,11 @@ void ChassisL_task(void)
             {
             case CHASSIS_STAND_UP:
             {
-                // DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[0], left.position_set[0], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[0], left.position_set[0], 0, DEBUG_POS_KP, DEBUG_POS_KD, 0);
                 osDelay(CHASS_TIME);
-                // DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[1], left.position_set[1], 0, NORMAL_POS_KP, NORMAL_POS_KD, 0);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[1], left.position_set[1], 0, DEBUG_POS_KP, DEBUG_POS_KD, 0);
                 osDelay(CHASS_TIME);
-                // LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[0], 0, left.wheel_T);
+                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[0], 0, left.wheel_T);
                 osDelay(CHASS_TIME);
             }
             break;
@@ -113,8 +113,8 @@ void ChassisL_init(void)
 
 void ChassisL_feedback_update(void)
 {
-    left.phi4 = theta_transform(chassis_move.joint_motor[0]->Data.Position, J0_ANGLE_OFFSET, J0_DIRECTION, 1);
-    left.phi1 = theta_transform(chassis_move.joint_motor[1]->Data.Position, J1_ANGLE_OFFSET, J1_DIRECTION, 1);
+    left.phi4 = theta_transform(-chassis_move.joint_motor[0]->Data.Position, J0_ANGLE_OFFSET, J0_DIRECTION, 1);
+    left.phi1 = theta_transform(-chassis_move.joint_motor[1]->Data.Position, J1_ANGLE_OFFSET, J1_DIRECTION, 1);
 
     chassis_move.myPithL = 0.0f - INS.Pitch;
     chassis_move.myPithGyroL = 0.0f - INS.Gyro[1];

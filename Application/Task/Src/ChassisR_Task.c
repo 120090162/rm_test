@@ -140,8 +140,8 @@ void Pensation_init(void)
 
 void ChassisR_feedback_update(void)
 {
-    right.phi1 = theta_transform(chassis_move.joint_motor[2]->Data.Position, J2_ANGLE_OFFSET, J2_DIRECTION, 1);
-    right.phi4 = theta_transform(chassis_move.joint_motor[3]->Data.Position, J3_ANGLE_OFFSET, J3_DIRECTION, 1);
+    right.phi1 = theta_transform(-chassis_move.joint_motor[2]->Data.Position, J2_ANGLE_OFFSET, J2_DIRECTION, 1);
+    right.phi4 = theta_transform(-chassis_move.joint_motor[3]->Data.Position, J3_ANGLE_OFFSET, J3_DIRECTION, 1);
 
     chassis_move.myPithR = INS.Pitch;
     chassis_move.myPithGyroR = INS.Gyro[1];
