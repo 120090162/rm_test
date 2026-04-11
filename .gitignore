@@ -35,6 +35,4 @@ application/chassis/matlab_balance/slprj/
 *.iex
 *.ini
 
-test.py
-
 MDK-ARM/.vscode/
