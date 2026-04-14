@@ -139,12 +139,12 @@ void ChassisL_control_loop(void)
 
     LQR_K_calc(left.L0, LQR_K_L); // 根据当前腿长计算lqr控制器的增益
 
-    x_l[0] = X0_OFFSET + (left.theta - 0.0f);                          // theta误差，目标theta是0
-    x_l[1] = X1_OFFSET + (left.d_theta - 0.0f);                        // theta_dot误差，目标theta_dot是0
-    x_l[2] = X2_OFFSET + (chassis_move.x_set - chassis_move.x_filter); // x误差，目标x是滤波后的x_set
-    x_l[3] = X3_OFFSET + (chassis_move.v_set - chassis_move.v_filter); // x_dot误差，目标x_dot是滤波后的v_set
-    x_l[4] = X4_OFFSET + (chassis_move.myPithL - (0.0f));              // phi误差，目标phi是0
-    x_l[5] = X5_OFFSET + (chassis_move.myPithGyroL - 0.0f);            // phi_dot误差，目标phi_dot是0
+    x_l[0] = X0_OFFSET + (left.theta - 0.0f);                           // theta误差，目标theta是0
+    x_l[1] = X1_OFFSET + (left.d_theta - 0.0f);                         // theta_dot误差，目标theta_dot是0
+    x_l[2] = -X2_OFFSET + (chassis_move.x_set - chassis_move.x_filter); // x误差，目标x是滤波后的x_set
+    x_l[3] = -X3_OFFSET + (chassis_move.v_set - chassis_move.v_filter); // x_dot误差，目标x_dot是滤波后的v_set
+    x_l[4] = -X4_OFFSET + (chassis_move.myPithL - (0.0f));              // phi误差，目标phi是0
+    x_l[5] = X5_OFFSET + (chassis_move.myPithGyroL - 0.0f);             // phi_dot误差，目标phi_dot是0
 
     CalcLQR(LQR_K_L, x_l, T_Tp_l); // 计算lqr控制量，得到的控制量是单位为牛顿的轮子的力矩和腿部力
 

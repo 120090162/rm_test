@@ -145,12 +145,12 @@
 // 离地检测相关参数
 #define TAKE_OFF_FN_THRESHOLD (3.0f) // 支持力阈值，当支持力小于这个值时认为离地
 
-// offest parameters ---------------------
-#define X0_OFFSET (0.0f) // 目标theta偏移量
-#define X1_OFFSET (0.0f) // 目标theta_dot偏移量
-#define X2_OFFSET (0.0f) // 目标x偏移量
-#define X3_OFFSET (0.0f) // 目标x_dot偏移量
-#define X4_OFFSET (0.0f) // 目标phi偏移量
-#define X5_OFFSET (0.0f) // 目标phi_dot偏移量
+// offset parameters ---------------------
+#define X0_OFFSET (0.0f)   // 目标theta偏移量
+#define X1_OFFSET (0.0f)   // 目标theta_dot偏移量
+#define X2_OFFSET (-0.09f) // 目标x偏移量
+#define X3_OFFSET (0.0f)   // 目标x_dot偏移量
+#define X4_OFFSET (0.0f)   // 目标phi偏移量
+#define X5_OFFSET (0.0f)   // 目标phi_dot偏移量
 
 #endif /* ROBOT_PARAM_H */
