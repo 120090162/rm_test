@@ -59,7 +59,7 @@
 #define MIN_ROLL (-MAX_ROLL)
 #define MIN_LEG_LENGTH (0.11f)
 
-#define INIT_LEG_LENGTH (0.12f) // (m)底盘初始腿长, 测试0.12-0.14比较合适
+#define INIT_LEG_LENGTH (0.2f) // (m)底盘初始腿长, 测试0.12-0.14比较合适
 // #define INIT_LEG_LENGTH (0.20f) // (m)底盘初始腿长
 #define INIT_ROLL (0.0f) // (rad)底盘初始滚转角
 

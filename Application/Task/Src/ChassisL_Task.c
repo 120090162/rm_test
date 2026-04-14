@@ -50,16 +50,16 @@ void ChassisL_task(void)
                 }
             }
             break;
-            // case CHASSIS_SAFE: // 正常车子状态，执行控制量
-            // {
-            //     DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[0], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, left.torque_set[1]);
-            //     osDelay(CHASS_TIME);
-            //     DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[1], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, left.torque_set[0]);
-            //     osDelay(CHASS_TIME);
-            //     LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[0], 0, left.wheel_T);
-            //     osDelay(CHASS_TIME);
-            // }
-            // break;
+            case CHASSIS_SAFE: // 正常车子状态，执行控制量
+            {
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[0], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, -left.torque_set[1]);
+                osDelay(CHASS_TIME);
+                DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[1], 0, 0, NORMAL_POS_KP, NORMAL_POS_KD, -left.torque_set[0]);
+                osDelay(CHASS_TIME);
+                LK_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.wheel_motor[0], 0, left.wheel_T);
+                osDelay(CHASS_TIME);
+            }
+            break;
             default:
             {
                 DM_Motor_CAN_TxMessage(&FDCAN3_TxFrame, chassis_move.joint_motor[0], 0, 0, 0, ZERO_FORCE_VEL_KD, 0);
@@ -246,14 +246,15 @@ void ChassisL_control_loop(void)
 
     VMC_calc_2(&left); // 计算期望的关节输出力矩
 
-    if (chassis_move.jump_flag2 == 1 || chassis_move.jump_flag2 == 2 || chassis_move.jump_flag2 == 3)
-    { // 跳跃的时候需要更大扭矩
-        mySaturate(&left.torque_set[0], MIN_JOINT_TORQUE_JUMP, MAX_JOINT_TORQUE_JUMP);
-        mySaturate(&left.torque_set[1], MIN_JOINT_TORQUE_JUMP, MAX_JOINT_TORQUE_JUMP);
-    }
-    else
-    { // 不跳跃的时候最大为额定扭矩
-        mySaturate(&left.torque_set[0], MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-        mySaturate(&left.torque_set[1], MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-    }
+    // 这里不对输出的力矩进行限制，直接让电机输出
+    // if (chassis_move.jump_flag2 == 1 || chassis_move.jump_flag2 == 2 || chassis_move.jump_flag2 == 3)
+    // { // 跳跃的时候需要更大扭矩
+    //     mySaturate(&left.torque_set[0], MIN_JOINT_TORQUE_JUMP, MAX_JOINT_TORQUE_JUMP);
+    //     mySaturate(&left.torque_set[1], MIN_JOINT_TORQUE_JUMP, MAX_JOINT_TORQUE_JUMP);
+    // }
+    // else
+    // { // 不跳跃的时候最大为额定扭矩
+    //     mySaturate(&left.torque_set[0], MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    //     mySaturate(&left.torque_set[1], MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    // }
 }
